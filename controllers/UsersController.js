@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const User = require('../models/UsersModel');
 
 const getUser = async (req, res) => {
@@ -17,7 +16,6 @@ const getUser = async (req, res) => {
 
 const postUser = async (req, res) => {
     const newUser = new User({
-        userId: req.body.userId,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         userName: req.body.userName,

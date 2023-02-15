@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const adSchema = new mongoose.Schema({
-    adId: Number,
     clientId: Number,
     sessionId: Number,
     campaignName: String,
@@ -25,6 +24,7 @@ const adSchema = new mongoose.Schema({
     image: String,
     adContent: String,
     tags: [],
+    assignedUsers: Number,
     users: []
 });
 

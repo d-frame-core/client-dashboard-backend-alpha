@@ -6,7 +6,9 @@ dotenv.config({ path: './.env' })
 
 const start = async () => {
 	try {
-		await mongoose.connect(process.env.CONNECTIONSTRING);
+		// await mongoose.connect(process.env.CONNECTIONSTRING);
+		mongoose.set('strictQuery', true);
+		await mongoose.connect("mongodb://127.0.0.1:27017/adCamp");
 		console.log("Db Connected");
 	} catch (err) {
 		console.error(err);

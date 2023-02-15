@@ -5,7 +5,6 @@ const User = require('../models/UsersModel');
 
 let fileName
 
-// async await in multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads')
@@ -37,7 +36,6 @@ const postAd = async (req, res) => {
     const newAd = new Ad({
 
         // uuid // nanoid
-        adId: req.body.adId,
         clientId: req.body.clientId,
         sessionId: req.body.sessionId,
         campaignName: req.body.campaignName,
@@ -59,7 +57,6 @@ const postAd = async (req, res) => {
             gender: req.body.gender
         },
         image: fileName,
-        video: req.body.video,
         adContent: req.body.adContent,
         tags: req.body.tags
     })

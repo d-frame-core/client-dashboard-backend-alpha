@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const AdsRoute = require('./routes/AdsRoute')
 const UsersRoute = require('./routes/UsersRoute')
+const BidsRoute = require('./routes/BidsRoute')
 
 const app = express();
 app.use(express.urlencoded({extended: false}));
@@ -34,6 +35,8 @@ app.use((req, res, next) => {
 app.use("/ads", AdsRoute)
 
 app.use("/users", UsersRoute)
+
+app.use("/bids", BidsRoute)
 
 app.use('/images', express.static('uploads'));
 
