@@ -5,10 +5,6 @@ const adSchema = new mongoose.Schema({
     sessionId: Number,
     campaignName: String,
     campaignType: String,
-    campaignBudget: {
-        perDay: Number,
-        totalDays: Number
-    },
     adName: String,
     socialMediaPages: {},
     startDate: String,

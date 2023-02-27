@@ -40,10 +40,6 @@ const postAd = async (req, res) => {
         sessionId: req.body.sessionId,
         campaignName: req.body.campaignName,
         campaignType: req.body.campaignType,
-        campaignBudget: {
-            perDay: req.body.perDay,
-            totalDays: req.body.totalDays
-        },
         adName: req.body.adName,
         socialMediaPages: req.body.socialMediaPages,
         startDate: req.body.startDate,

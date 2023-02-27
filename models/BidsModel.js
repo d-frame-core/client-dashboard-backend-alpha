@@ -2,6 +2,10 @@ const mongoose = require("mongoose")
 
 const bidSchema = mongoose.Schema({
     clientId: String,
+    campaignBudget: {
+        perDay: Number,
+        totalDays: Number
+    },
     bidAmount: Number
 })
 
