@@ -70,12 +70,70 @@ const getBid = async (req, res) => {
 };
 
 const updateBid = async (req, res) => {
+  const clientId = req.params.id;
+  const bidAmount = req.body.bidAmount;
+
   try {
-    Bid.updateOne({ clientId: req.params.id }, { $set: req.body }, (err) => {
-      if (!err) {
-        res.status(200).json({ message: "Updated Successfully" });
-      }
+    await Bid.deleteOne({ clientId: clientId }, (err) => {
+      // if (!err) {
+      //   res.status(200).json({ message: "Deleted Successfully" });
+      // }
     });
+  } catch (err) {
+    // res.status(500).json({ message: "Error Occured", error: err });
+    console.log(err);
+  }
+
+  const newBid = new Bid({
+    clientId,
+    campaignBudget: {
+      perDay: req.body.perDay,
+      totalDays: req.body.totalDays,
+    },
+    bidAmount,
+  });
+
+  try {
+    const savedBid = await newBid.save();
+    console.log(savedBid);
+
+    const result = await Bid.aggregate([
+      { $sort: { bidAmount: -1 } },
+      {
+        $group: {
+          _id: null,
+          clientIds: { $push: "$bidAmount" },
+        },
+      },
+    ]);
+    console.log(result[0].clientIds);
+
+    let rank = result[0].clientIds.indexOf(bidAmount) + 1;
+    console.log("rank: ", rank);
+
+    const users = await User.countDocuments();
+    console.log("no of users in log", users);
+
+    const bids = await Bid.countDocuments();
+    console.log("no of bids in log", bids);
+
+    console.log(users);
+    console.log(bids);
+    console.log(rank);
+    let assignedUsers = gettingUsers(users, bids, rank)
+    console.log(assignedUsers);
+
+    Ad.updateOne(
+      { _id: clientId },
+      {
+        $set: {
+          users: { $slice: assignedUsers },
+          assignedUsers: assignedUsers,
+        },
+      }
+    );
+
+    res.status(201).json({ message: "post updated", savedBid });
   } catch (err) {
     res.status(500).json({ message: "Error Occured", error: err });
   }
