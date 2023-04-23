@@ -16,7 +16,7 @@ router.get('/client/',checkToken,  SurveyController.getSurveysByclient);
 router.get('/:surveyId', checkToken, SurveyController.findOne);
 
 // Update a survey by ID
-router.put('/:surveyId', checkToken, SurveyController.update);
+router.put('/:surveyId',  SurveyController.update);
 
 // Delete a survey by ID
 router.delete('/:surveyId', checkToken, SurveyController.delete);
@@ -36,13 +36,16 @@ router.get("/expired/:id", checkToken, SurveyController.getExpiredSurveyById);
 //Get expierdsurveys of a particular client
 router.get('/expired/client/c', checkToken, SurveyController.getExpiredSurveysByclientid);
 
-//router.get("/expireD/client/data",checkToken, SurveyController.getExpiredSurveysByclientid);
+
 //delete expired survey of particular client
 
 router.delete("/expired/removeS", SurveyController.deleteExpiredSurveys);
 
 // Get analysis of the most chosen answer for each question
 router.get('/:surveyId/analysis', checkToken, SurveyController.getSurveyAnalysis);
+
+//active and inactive the survey
+router.put('/:id/status', SurveyController.updateStatusSurvey);
 
 module.exports = router;
 

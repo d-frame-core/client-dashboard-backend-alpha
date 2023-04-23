@@ -3,10 +3,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const AdsRoute = require('./routes/AdsRoute');
+const FaqRoute = require('./routes/FaqRoute');
+const HelpRoute = require('./routes/HelpRoute');
 const UsersRoute = require('./routes/UsersRoute');
 const SurveyRoute = require('./routes/SurveyRoute');
 const AuthRoute = require('./routes/AuthRoute');
+const LearnMoreRoute = require('./routes/LearnMoreRoute');
 const ProfileRoute = require('./routes/ImageRoute');
+const BidsRoute = require('./routes/BidsRoute')
 const path = require('path');
 
 const app = express();
@@ -43,7 +47,10 @@ app.use('/ads', AdsRoute);
 app.use('/users', UsersRoute);
 app.use('/survey', SurveyRoute);
 app.use('/auth', AuthRoute);
+app.use('/LearnMore', LearnMoreRoute);
+app.use('/Help', HelpRoute);
+app.use('/F&Q', FaqRoute);
+app.use("/bids", BidsRoute)
 app.use('/uploads', express.static('uploads'), ProfileRoute);
-
 
 module.exports = { app };

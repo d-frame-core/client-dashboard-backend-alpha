@@ -41,7 +41,7 @@ exports.createSurvey = async (req, res) => {
 };
 
 // Get all surveys created by a particular client
-exports.getSurveysByclient = async (req, res) => {
+/*exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;
   try {
     const surveys = await Survey.find({ clientId: clientId });
@@ -49,7 +49,22 @@ exports.getSurveysByclient = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-};
+};*/
+exports.getSurveysByclient = async (req, res) => {
+  const clientId = req.headers.clientid;
+  const currentDate = new Date();
+
+  try {
+    const surveys = await Survey.find({ 
+      clientId: clientId,
+      endDate: { $gte: currentDate }
+    });
+
+    res.json(surveys);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
 
     
     
@@ -285,4 +300,22 @@ exports.findOne = (req, res) => {
         message: "Error retrieving survey with id " + surveyId
       });
     });
+};
+exports.updateStatusSurvey = async (req, res) => {
+  try {
+    const survey = await Survey.findById(req.params.id);
+
+    if (!survey) {
+      return res.status(404).json({ message: 'Survey not found' });
+    }
+
+    // Update survey status based on request body
+    survey.statusCampaign = req.body.isActive ? 'active' : 'inactive';
+    await survey.save();
+
+    return res.status(200).json({ message: 'Survey status updated successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };

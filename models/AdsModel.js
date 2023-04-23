@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 
 const adSchema = new mongoose.Schema({
-    adId: Number,
-    clientId: Number,
+    clientId: {
+        type:  mongoose.Schema.Types.ObjectId,
+        ref: 'Client',
+        required: true
+    },
     sessionId: Number,
     campaignName: String,
     campaignType: String,
-    campaignBudget: {
-        perDay: Number,
-        totalDays: Number
-    },
     adName: String,
     socialMediaPages: {},
     startDate: String,
@@ -24,7 +23,9 @@ const adSchema = new mongoose.Schema({
     },
     image: String,
     adContent: String,
+    adImpressions: Number,
     tags: [],
+    assignedUsers: Number,
     users: []
 });
 

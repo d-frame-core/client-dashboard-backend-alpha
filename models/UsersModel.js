@@ -9,7 +9,8 @@ const userSchema = mongoose.Schema({
   companyAddress2:  String, 
   walletAddress:  { type: String, required: true }, 
   jwtSession:  String,
-  jwtExpire:  Date
+  jwtExpire:  Date,
+  tags: []
 });
 
 module.exports = mongoose.model("User", userSchema);

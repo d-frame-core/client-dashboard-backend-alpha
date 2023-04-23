@@ -1,3 +1,6 @@
+// AD history
+// Analytics
+
 const Ad = require("../models/AdsModel");
 const multer = require('multer');
 const path = require('path');
@@ -5,7 +8,6 @@ const User = require('../models/UsersModel');
 
 let fileName
 
-// async await in multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads')
@@ -32,20 +34,15 @@ const getAd = async (req, res) => {
         res.status(500).json(err)
     }
 }
-
+    
 const postAd = async (req, res) => {
     const newAd = new Ad({
 
         // uuid // nanoid
-        adId: req.body.adId,
         clientId: req.body.clientId,
         sessionId: req.body.sessionId,
         campaignName: req.body.campaignName,
         campaignType: req.body.campaignType,
-        campaignBudget: {
-            perDay: req.body.perDay,
-            totalDays: req.body.totalDays
-        },
         adName: req.body.adName,
         socialMediaPages: req.body.socialMediaPages,
         startDate: req.body.startDate,
@@ -59,7 +56,6 @@ const postAd = async (req, res) => {
             gender: req.body.gender
         },
         image: fileName,
-        video: req.body.video,
         adContent: req.body.adContent,
         tags: req.body.tags
     })
@@ -104,7 +100,17 @@ const updateAd = (req, res) => {
         res.status(500).json({message: "Error Occured", error: err})
     }
 }
-
+const getAllClientDetails = async (req, res) => {
+    try {
+      const clientId = req.headers.clientid;
+      const clientDetails = await Ad.find({ clientId });
+      res.status(200).json(clientDetails);
+    } catch (err) {
+      res.status(500).json({ message: "Error Occured", error: err });
+    }
+  };
+  
+  
 const deleteAd = (req, res) => {
     try {
         Ad.deleteOne({adId: req.params.id}, (err) => {
@@ -119,5 +125,5 @@ const deleteAd = (req, res) => {
 }
 
 module.exports = {
-    getAd, postAd, updateAd, deleteAd, upload
+    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails
 }
