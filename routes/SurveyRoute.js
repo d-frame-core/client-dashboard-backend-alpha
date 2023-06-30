@@ -44,7 +44,7 @@ router.delete("/expired/removeS", SurveyController.deleteExpiredSurveys);
 // Get analysis of the most chosen answer for each question
 router.get('/:surveyId/analysis', checkToken, SurveyController.getSurveyAnalysis);
 
-//active and inactive the survey
+//active and inactive the survey mainly for admin
 router.put('/:id/status', SurveyController.updateStatusSurvey);
 
 module.exports = router;

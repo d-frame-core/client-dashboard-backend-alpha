@@ -24,9 +24,6 @@ router.post("/refresh-token", function(req, res) {
     });
 });
 
-
-
-
 // Verify JWT token route
 router.post("/verify-token", function(req, res) {
   const decoded = authController.verifyToken(req.headers.token);

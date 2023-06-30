@@ -124,6 +124,22 @@ const deleteAd = (req, res) => {
     }
 }
 
+const adminUpdateAd = (req, res) => {
+    try {
+        Ad.updateOne(
+            {adId: req.params.id},
+            {$set: {status:req.body.status}},
+            (err) => {
+            if(!err) {
+                res.status(200).json({message: "Updated Successfully"});
+            }
+        })
+    }
+    catch (err) {
+        res.status(500).json({message: "Error Occured", error: err})
+    }
+}
+
 module.exports = {
-    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails
+    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails, adminUpdateAd
 }

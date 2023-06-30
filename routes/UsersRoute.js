@@ -11,4 +11,8 @@ router.post("/", controller.postUser);
 router.patch("/:id",controller.updateUser);
 router.delete("/:id", controller.deleteUser);
 router.get("/proctedRoute", controller.checkToken);
+
+//admin
+router.patch("/admin/:id",controller.adminUpdateUser);
+
 module.exports = router;

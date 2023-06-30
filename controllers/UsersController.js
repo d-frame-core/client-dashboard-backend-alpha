@@ -153,6 +153,23 @@ const signupUser = async (req, res) => {
     }
   };
 
+
+  const adminUpdateUser = (req, res) => {
+    try {
+        User.updateOne(
+            {_id: req.params.id},
+            {$set:{ Status: req.body.status }},
+            (err) => {
+            if(!err) {
+                res.status(200).json({message: "Updated Successfully"});
+            }
+        })
+    }
+    catch (err) {
+        res.status(500).json({message: "Error Occures", error: err})
+    }
+}
+
                
             
             module.exports = {
@@ -163,7 +180,8 @@ const signupUser = async (req, res) => {
             deleteUser,
             loginUser,
             checkToken,
-            signupUser
+            signupUser,
+            adminUpdateUser
             };
 
 

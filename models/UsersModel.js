@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema({
   companyEmail:   { type: String, required: true },
   companyAddress1:  String, 
   companyAddress2:  String, 
+  status : String,
   walletAddress:  { type: String, required: true }, 
   jwtSession:  String,
   jwtExpire:  Date,
