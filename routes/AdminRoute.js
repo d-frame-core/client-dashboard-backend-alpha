@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/AuthController");
 const Admin = require("../models/AdminModel");
+const bcrypt = require("bcryptjs");
 const { updateMany } = require("../models/TokenModel");
+const jwt = require("jsonwebtoken");
 
 // Generate JWT token route
 router.post("/generateAdminToken", function (req, res) {
@@ -10,17 +12,53 @@ router.post("/generateAdminToken", function (req, res) {
   res.json({ token });
 });
 
+// Register the admin
 router.post("/register", async function (req, res) {
   try {
     const { firstname, lastname, email, password } = req.body;
+
     if (!(firstname && lastname && email && password)) {
       res.status(400).json({ errMsg: "All fields are compulsory" });
     }
-    const existingUser = await Admin.findOne({ email });
-    if (existingUser) {
-      res.status(401).json({ errMsg: "User already exists with this email" });
+
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      res.status(401).json({ errMsg: "Admin already exists with this email" });
     }
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    const admin = await Admin.create({
+      firstname,
+      lastname,
+      email,
+      password: encryptedPassword,
+    });
+
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    admin.token = token;
+    admin.password = undefined;
+
+    res.status(201).json(admin);
   } catch (error) {}
+});
+
+// Login the admin
+router.post("/login", async function (req, res) {
+  const { email, password } = req.body;
+
+  if (email && password) {
+    res.status(400).json({ errMsg: "All fields are compulsory" });
+  }
+
+  const admin = await Admin.findOne({ email });
+  if (!admin) {
+    res.status(400).json({ errMsg: "Admin not found" });
+  }
+
+  await bcrypt.compare(password, admin.password);
 });
 
 // Refresh JWT token route
