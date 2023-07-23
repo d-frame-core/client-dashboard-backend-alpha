@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/AuthController");
+// const authController = require("../controllers/AuthController");
 const Admin = require("../models/AdminModel");
 const bcrypt = require("bcryptjs");
 const { updateMany } = require("../models/TokenModel");
 const jwt = require("jsonwebtoken");
 
 // Generate JWT token route
-router.post("/generateAdminToken", function (req, res) {
-  const token = authController.generateToken(req.body.user);
-  res.json({ token });
-});
+// router.post("/generateAdminToken", function (req, res) {
+//   const token = authController.generateToken(req.body.user);
+//   res.json({ token });
+// });
 
 // Register the admin
 router.post("/register", async function (req, res) {
@@ -42,75 +42,98 @@ router.post("/register", async function (req, res) {
     admin.password = undefined;
 
     res.status(201).json(admin);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // Login the admin
 router.post("/login", async function (req, res) {
   const { email, password } = req.body;
 
-  if (email && password) {
-    res.status(400).json({ errMsg: "All fields are compulsory" });
-  }
+  // all the data should exist
+  try {
+    if (!(email && password)) {
+      res.status(400).send("All fields are compulsory");
+    }
 
-  const admin = await Admin.findOne({ email });
-  if (!admin) {
-    res.status(400).json({ errMsg: "Admin not found" });
-  }
+    // check if user exists & match password
+    let token;
+    const user = await User.findOne({ email });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "2h" });
+    }
 
-  await bcrypt.compare(password, admin.password);
+    user.token = token;
+    user.password = undefined;
+
+    // cookie section
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    };
+    res.status(200).cookie("token", token, options).json({
+      success: true,
+      token,
+      user,
+    });
+
+    await bcrypt.compare(password, admin.password);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // Refresh JWT token route
-router.post("/refreshAdminToken", function (req, res) {
-  authController
-    .refreshToken(req.headers.token)
-    .then((newToken) => {
-      if (!newToken) {
-        return res.status(401).json({ error: "Invalid token" });
-      }
-      //console.log(newToken)
-      res.json({ token: newToken });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
-    });
-});
+// router.post("/refreshAdminToken", function (req, res) {
+//   authController
+//     .refreshToken(req.headers.token)
+//     .then((newToken) => {
+//       if (!newToken) {
+//         return res.status(401).json({ error: "Invalid token" });
+//       }
+//       //console.log(newToken)
+//       res.json({ token: newToken });
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//       res.status(500).json({ error: "Internal server error" });
+//     });
+// });
 
 // Verify JWT token route
-router.post("/verifyAdminToken", function (req, res) {
-  const decoded = authController.verifyToken(req.headers.token);
-  if (!decoded) {
-    return res.status(401).json({ error: "Invalid token" });
-  }
-  res.json({ decoded });
-});
+// router.post("/verifyAdminToken", function (req, res) {
+//   const decoded = authController.verifyToken(req.headers.token);
+//   if (!decoded) {
+//     return res.status(401).json({ error: "Invalid token" });
+//   }
+//   res.json({ decoded });
+// });
 
 // Protected route
-router.get("/protectedAdminRoute", function (req, res) {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ error: "Token is not provided." });
-  }
-  if (token.startsWith("Bearer ")) {
-    token = token.slice(7, token.length);
-  }
+// router.get("/protectedAdminRoute", function (req, res) {
+//   const token = req.headers.authorization;
+//   if (!token) {
+//     return res.status(401).json({ error: "Token is not provided." });
+//   }
+//   if (token.startsWith("Bearer ")) {
+//     token = token.slice(7, token.length);
+//   }
 
-  const decoded = authController.verifyToken(token);
-  if (!decoded) {
-    return res
-      .status(401)
-      .json({ error: "Session expired. Please log in again." });
-  }
+//   const decoded = authController.verifyToken(token);
+//   if (!decoded) {
+//     return res
+//       .status(401)
+//       .json({ error: "Session expired. Please log in again." });
+//   }
 
-  const result = authController.refreshToken(token);
-  if (result.error) {
-    return res.status(401).json({ error: result.error });
-  }
+//   const result = authController.refreshToken(token);
+//   if (result.error) {
+//     return res.status(401).json({ error: result.error });
+//   }
 
-  res.set("Authorization", `Bearer ${result.token}`);
-  res.json({ message: "Welcome to the protected route!" });
-});
+//   res.set("Authorization", `Bearer ${result.token}`);
+//   res.json({ message: "Welcome to the protected route!" });
+// });
 
 module.exports = router;
