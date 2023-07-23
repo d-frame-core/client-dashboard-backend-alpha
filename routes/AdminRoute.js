@@ -5,10 +5,11 @@ const Admin = require("../models/AdminModel");
 const bcrypt = require("bcryptjs");
 const { updateMany } = require("../models/TokenModel");
 const jwt = require("jsonwebtoken");
+const auth = require("../Middleware/auth");
 
 // Generate JWT token route
 // router.post("/generateAdminToken", function (req, res) {
-//   const token = authController.generateToken(req.body.user);
+//   const token = authController.generateToken(req.body.admin);
 //   res.json({ token });
 // });
 
@@ -47,25 +48,32 @@ router.post("/register", async function (req, res) {
   }
 });
 
-// Login the admin
+// Login the Admin
 router.post("/login", async function (req, res) {
-  const { email, password } = req.body;
-
-  // all the data should exist
   try {
+    // take all data from the form
+    const { email, password } = req.body;
+
+    // all the data should exist
     if (!(email && password)) {
-      res.status(400).send("All fields are compulsory");
+      res.status(400).json("All fields are compulsory");
     }
 
-    // check if user exists & match password
-    let token;
-    const user = await User.findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "2h" });
+    // check if admin exists & match password
+    const admin = await Admin.findOne({ email });
+    if (!admin || !(await bcrypt.compare(password, admin.password))) {
+      // If no admin is found or password doesn't match, send an error response
+      res.status(400).json("Invalid email or password");
+      return; // Exit the function early to avoid further processing
     }
 
-    user.token = token;
-    user.password = undefined;
+    // Admin found and password matched, proceed with generating token and setting cookie
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+
+    admin.token = token;
+    admin.password = undefined;
 
     // cookie section
     const options = {
@@ -75,13 +83,19 @@ router.post("/login", async function (req, res) {
     res.status(200).cookie("token", token, options).json({
       success: true,
       token,
-      user,
+      admin,
     });
-
-    await bcrypt.compare(password, admin.password);
   } catch (error) {
     console.log(error);
   }
+});
+
+router.get("/dashboard", auth, function (req, res) {
+  console.log("Welcome to dashboard");
+});
+
+router.post("/logout", function (req, res) {
+  res.status(200).clearCookie("token").json("Logged out successfully: ");
 });
 
 // Refresh JWT token route
