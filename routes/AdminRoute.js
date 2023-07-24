@@ -19,12 +19,12 @@ router.post("/register", async function (req, res) {
     const { firstname, lastname, email, password } = req.body;
 
     if (!(firstname && lastname && email && password)) {
-      res.status(400).json({ errMsg: "All fields are compulsory" });
+      res.status(400).json("All fields are compulsory");
     }
 
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
-      res.status(401).json({ errMsg: "Admin already exists with this email" });
+      res.status(401).json("Admin already exists with this email");
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
@@ -42,7 +42,16 @@ router.post("/register", async function (req, res) {
     admin.token = token;
     admin.password = undefined;
 
-    res.status(201).json(admin);
+    // cookie section
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    };
+    res.status(200).cookie("token", token, options).json({
+      success: true,
+      token,
+      admin,
+    });
   } catch (error) {
     console.log(error);
   }
