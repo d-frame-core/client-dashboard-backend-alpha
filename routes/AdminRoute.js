@@ -61,18 +61,20 @@ router.post("/register", async function (req, res) {
 router.post("/login", async function (req, res) {
   try {
     // take all data from the form
-    const { email, password } = req.body;
+    const { email, password, phoneNumber } = req.body;
 
     // all the data should exist
-    if (!(email && password)) {
+    if (!(email && password && phoneNumber)) {
       res.status(400).json("All fields are compulsory");
     }
 
     // check if admin exists & match password
     const admin = await Admin.findOne({ email });
-    if (!admin || !(await bcrypt.compare(password, admin.password))) {
+    const checkNumber = admin.phoneNumber == phoneNumber;
+    const checkPassword = await bcrypt.compare(password, admin.password);
+    if (!(admin && checkPassword && checkNumber)) {
       // If no admin is found or password doesn't match, send an error response
-      res.status(400).json("Invalid email or password");
+      res.status(400).json("Invalid email or password or phone number");
       return; // Exit the function early to avoid further processing
     }
 
@@ -103,7 +105,7 @@ router.get("/dashboard", auth, function (req, res) {
   console.log("Welcome to dashboard");
 });
 
-router.post("/logout", function (req, res) {
+router.get("/logout", function (req, res) {
   res.status(200).clearCookie("token").json("Logged out successfully: ");
 });
 
