@@ -1,4 +1,4 @@
-const Help = require('../models/HelpModel');
+const HelpUser = require('../models/HelpmodelUser');
 
 const HData = [
     {
@@ -21,35 +21,24 @@ const HData = [
   
   exports.createHelp = async (req, res) => {
     try {
-      const HelpArray = [];
+      const HelpUserArray = [];
   
       for (const data of HData) {
-        const newHelp = new Help(data);
-        await newHelp.save();
-        HelpArray.push(newHelp);
+        const newHelpUser = new HelpUser(data);
+        await newHelpUser.save();
+        HelpUserArray.push(newHelpUser);
       }
   
-      res.status(201).json(HelpArray);
+      res.status(201).json(HelpUserArray);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
-
-  exports.createSingleHelp = (req, res) => { 
-    const newHelp = new Help(req.body);
-    newHelp.save((err, help) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        res.json(help);
-      }
-    });
-  };
-
+  
   exports.getAllhelp = async (req, res) => {
     try {
-      const help = await Help.find({});
-      res.status(200).json(help);
+      const helpUser = await HelpUser.find({});
+      res.status(200).json(helpUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -57,39 +46,22 @@ const HData = [
 
   exports.delete = async (req, res) => {
     try {
-      await Help.deleteMany();
+      await HelpUser.deleteMany();
       res.json({ message: " deleted successfully!" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   };
-
-  exports.deleteSingle = async (req, res) => {
-    const { id } = req.params;
-    try {
-      const deletedHelp = await Help.findByIdAndDelete(id);
-      
-      if (!deletedHelp) {
-        return res.status(404).json({ message: "Help Section not found!" });
-      }
-  
-      res.json({ message: "Survey deleted successfully!", deletedHelp });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  };
-
-
   exports.updateHelp = async (req, res) => {
     try {
-      const help = await Help.findByIdAndUpdate(req.params.id, req.body, {
+      const HelpUser = await HelpUser.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
       });
-      if (!help) {
+      if (!HelpUser) {
         return res.status(404).json({ error: " not found" });
       }
-      res.status(200).json(help);
+      res.status(200).json(HelpUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -97,11 +69,11 @@ const HData = [
   
   exports.gethelpById = async (req, res) => {
     try {
-      const help = await Help.findById(req.params.id);
-      if (!help) {
+      const HelpUser = await HelpUser.findById(req.params.id);
+      if (!HelpUser) {
         return res.status(404).json({ message: " entry not found" });
       }
-      res.status(200).json(help);
+      res.status(200).json(HelpUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

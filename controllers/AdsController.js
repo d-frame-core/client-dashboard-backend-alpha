@@ -34,7 +34,17 @@ const getAd = async (req, res) => {
         res.status(500).json(err)
     }
 }
-    
+ 
+const getAllAd = async (req, res) => {
+    try {
+        const foundAd = await Ad.find() 
+            res.status(200).json(foundAd)
+    }
+    catch(err) {
+        res.status(500).json(err)
+    }
+}
+
 const postAd = async (req, res) => {
     const newAd = new Ad({
 
@@ -100,10 +110,11 @@ const updateAd = (req, res) => {
         res.status(500).json({message: "Error Occured", error: err})
     }
 }
+
 const getAllClientDetails = async (req, res) => {
+    const clientId = req.params.id
     try {
-      const clientId = req.headers.clientid;
-      const clientDetails = await Ad.find({ clientId });
+      const clientDetails = await Ad.find({ "clientId": clientId });
       res.status(200).json(clientDetails);
     } catch (err) {
       res.status(500).json({ message: "Error Occured", error: err });
@@ -141,5 +152,5 @@ const adminUpdateAd = (req, res) => {
 }
 
 module.exports = {
-    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails, adminUpdateAd
+    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails, adminUpdateAd, getAllAd
 }

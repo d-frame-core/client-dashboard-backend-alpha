@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
-const LearnSchema = new mongoose.Schema({
+const LearnMoreSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true
   },
   text: {
-    type: String, 
+    type: String,
     required: true
   },
   pdf: {
@@ -14,6 +14,6 @@ const LearnSchema = new mongoose.Schema({
   }
 });
 
-const LearnMore = mongoose.model('LearnMore', LearnSchema);
+const LearnUser = mongoose.model('LearnUser', LearnMoreSchema);
 
-module.exports = LearnMore;
+module.exports = LearnUser;

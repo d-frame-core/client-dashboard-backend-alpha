@@ -1,4 +1,4 @@
-const FAQ = require('../models/FaqModel');
+const FAQUser = require('../models/FaqModelUser');
 
 const questions = [
   {
@@ -31,18 +31,18 @@ const questions = [
   }
 ];
 
-exports.createFAQ = async (req, res) => {
+exports.createFAQUser = async (req, res) => {
   try {
-    await FAQ.insertMany(questions);
+    await FAQUser.insertMany(questions);
     res.status(201).json({ message: 'FAQs created successfully.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to create FAQs.' });
   }
 };
-exports.getAllFAQs = async (req, res) => {
+exports.getAllFAQUsers = async (req, res) => {
     try {
-      const faqs = await FAQ.find();
+      const faqs = await FAQUser.find();
       res.status(200).json(faqs);
     } catch (error) {
       console.error(error);
@@ -50,9 +50,9 @@ exports.getAllFAQs = async (req, res) => {
     }
   };
   // Get a FAQ by its ID
-exports.getFAQById = async (req, res) => {
+exports.getFAQUserById = async (req, res) => {
     try {
-      const faq = await FAQ.findById(req.params.id);
+      const faq = await FAQUser.findById(req.params.id);
       if (!faq) {
         return res.status(404).json({ error: 'FAQ not found' });
       }
@@ -64,32 +64,32 @@ exports.getFAQById = async (req, res) => {
   };
 
   //admin
-  exports.updateFAQById = async (req, res) => {
+  exports.updateFAQUserById = async (req, res) => {
     const { id } = req.params;
     const { question, answer } = req.body;
   
     try {
-      const updatedFAQ = await FAQ.findByIdAndUpdate(
+      const updatedFAQUser = await FAQUser.findByIdAndUpdate(
         id,
         { question, answer },
         { new: true }
       );
   
-      if (!updatedFAQ) {
+      if (!updatedFAQUser) {
         return res.status(404).json({ error: 'FAQ not found' });
       }
   
-      res.json(updatedFAQ);
+      res.json(updatedFAQUser);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Server error' });
     }
   };
 
-  exports.deleteSingleFaq = async (req, res) => {
+  exports.deleteSingleFAQUser = async (req, res) => {
     const { id } = req.params;
     try {
-      const deletedFAQ = await FAQ.findByIdAndDelete(id);
+      const deletedFAQ = await FAQUser.findByIdAndDelete(id);
       
       if (!deletedFAQ) {
         return res.status(404).json({ message: "FAQ Section not found!" });

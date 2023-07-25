@@ -12,6 +12,7 @@ const LearnMoreRoute = require('./routes/LearnMoreRoute');
 const ProfileRoute = require('./routes/ImageRoute');
 const BidsRoute = require('./routes/BidsRoute')
 const AdminRoute = require('./routes/AdminRoute')
+const DframeUser = require('./routes/DframeUser')
 const path = require('path');
 
 const app = express();
@@ -46,11 +47,12 @@ app.use((req, res, next) => {
 // Set up routes
 app.use('/ads', AdsRoute);
 app.use('/users', UsersRoute);
+app.use('/dframeUser', DframeUser);
 app.use('/survey', SurveyRoute);
 app.use('/auth', AuthRoute);
-app.use('/LearnMore', LearnMoreRoute);
-app.use('/Help', HelpRoute);
-app.use('/F&Q', FaqRoute);
+app.use('/LearnMore', LearnMoreRoute);//admin done
+app.use('/Help', HelpRoute);//admin done
+app.use('/F&Q', FaqRoute);//admin done
 app.use("/bids", BidsRoute)
 app.use("/admin", AdminRoute)
 app.use('/uploads', express.static('uploads'), ProfileRoute);

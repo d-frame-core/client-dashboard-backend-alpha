@@ -1,4 +1,4 @@
-const LearnMore = require('../models/LearnModel');
+const LearnUser = require('../models/LearnModelUser');
 
 const learnMoreData = [
     {
@@ -19,33 +19,34 @@ const learnMoreData = [
     },
   ];
   
-  exports.createLearnMore = async (req, res) => {
+  exports.createLearnUser = async (req, res) => {
     try {
-      const learnMoreArray = [];
+      const learnUserArray = [];
   
       for (const data of learnMoreData) {
-        const learnMore = new LearnMore(data);
-        await learnMore.save();
-        learnMoreArray.push(learnMore);
+        const learnUser = new LearnUser(data);
+        await learnUser.save();
+        learnUserArray.push(learnUser);
       }
   
-      res.status(201).json(learnMoreArray);
+      res.status(201).json(learnUserArray);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
   
-  exports.getAllLearnMore = async (req, res) => {
+  exports.getAllLearnUser = async (req, res) => {
     try {
-      const learnMore = await LearnMore.find({});
-      res.status(200).json(learnMore);
+      const learnUser = await LearnUser.find({});
+      res.status(200).json(learnUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
-  exports.delete = async (req, res) => {
+  
+  exports.deleteLearn = async (req, res) => {
     try {
-      await LearnMore.deleteMany();
+      await LearnUser.deleteMany();
       res.json({ message: "All Learns deleted successfully!" });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -55,7 +56,7 @@ const learnMoreData = [
   exports.deleteSingle = async (req, res) => {
     const { id } = req.params;
     try {
-      const deletedLearn = await LearnMore.findByIdAndDelete(id);
+      const deletedLearn = await LearnUser.findByIdAndDelete(id);
       
       if (!deletedLearn) {
         return res.status(404).json({ message: "Learn not found!" });
@@ -67,28 +68,28 @@ const learnMoreData = [
     }
   };
 
-  exports.updateLearnMore = async (req, res) => {
+  exports.updateLearnUser = async (req, res) => {
     try {
-      const learnMore = await LearnMore.findByIdAndUpdate(req.params.id, req.body, {
+      const learnUser = await LearnUser.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
       });
-      if (!learnMore) {
-        return res.status(404).json({ error: "LearnMore not found" });
+      if (!learnUser) {
+        return res.status(404).json({ error: "LearnUser not found" });
       }
-      res.status(200).json(learnMore);
+      res.status(200).json(learnUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
   
-  exports.getLearnMoreById = async (req, res) => {
+  exports.getLearnUserById = async (req, res) => {
     try {
-      const learnMore = await LearnMore.findById(req.params.id);
-      if (!learnMore) {
-        return res.status(404).json({ message: "LearnMore entry not found" });
+      const learnUser = await LearnUser.findById(req.params.id);
+      if (!learnUser) {
+        return res.status(404).json({ message: "LearnUser entry not found" });
       }
-      res.status(200).json(learnMore);
+      res.status(200).json(learnUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

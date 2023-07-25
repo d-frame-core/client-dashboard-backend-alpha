@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = require('../models/UsersModel');
+const AdsModel = require('../models/AdsModel');
 require('dotenv').config()
 
 //Get all detail
@@ -19,21 +20,28 @@ const getUser = async (req, res) => {
 } 
 //Get detail by id
 const getUserbyid = (req, res) => {
-   // console.log(req.params.id);
-  
-       User.findById(req.params.id)
+   const clientId = req.params.id
+       User.findById(clientId)
       .then(foundUser => {
         if (foundUser) {
-          //console.log(foundUser);
-          res.status(200).json({User:foundUser});
+            // try {
+            //     const clientDetails = AdsModel.find(clientId);
+            //     res.status(200).json({
+            //         UserData:foundUser,
+            //         UserCampaigns:clientDetails
+            //     });
+            //   } catch (err) {
+            //     res.status(500).json({ message: "Error Occured while getting userCampaigns", error: err });
+            //   } 
+            res.status(200).json(foundUser);
         } else {
          res.status(200).json("No User Found");
        }
-    })
-      
+    }) 
       .catch(err => {
         res.status(500).json({ message: "Error Occured" });
       });
+        
   }
   
 
@@ -169,7 +177,6 @@ const signupUser = async (req, res) => {
         res.status(500).json({message: "Error Occures", error: err})
     }
 }
-
                
             
             module.exports = {
