@@ -1,28 +1,30 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const AdsRoute = require('./routes/AdsRoute');
-const FaqRoute = require('./routes/FaqRoute');
-const HelpRoute = require('./routes/HelpRoute');
-const UsersRoute = require('./routes/UsersRoute');
-const SurveyRoute = require('./routes/SurveyRoute');
-const AuthRoute = require('./routes/AuthRoute');
-const LearnMoreRoute = require('./routes/LearnMoreRoute');
-const ProfileRoute = require('./routes/ImageRoute');
-const BidsRoute = require('./routes/BidsRoute')
-const AdminRoute = require('./routes/AdminRoute')
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const helmet = require("helmet");
+const AdsRoute = require("./routes/AdsRoute");
+const FaqRoute = require("./routes/FaqRoute");
+const HelpRoute = require("./routes/HelpRoute");
+const UsersRoute = require("./routes/UsersRoute");
+const SurveyRoute = require("./routes/SurveyRoute");
+const AuthRoute = require("./routes/AuthRoute");
+const LearnMoreRoute = require("./routes/LearnMoreRoute");
+const ProfileRoute = require("./routes/ImageRoute");
+const BidsRoute = require("./routes/BidsRoute");
+const AdminRoute = require("./routes/AdminRoute");
 const DframeUser = require('./routes/DframeUser')
-const path = require('path');
+const path = require("path");
+const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   helmet({
     frameguard: {
-      action: 'deny',
+      action: "deny",
     },
     hidePoweredBy: true,
     xssFilter: true,
@@ -32,15 +34,18 @@ app.use(
       maxAge: 7776000,
       force: true,
     },
-  }),
+  })
 );
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+  );
   next();
 });
 
