@@ -23,15 +23,6 @@ const getUserbyid = (req, res) => {
        User.findById(clientId)
       .then(foundUser => {
         if (foundUser) {
-            // try {
-            //     const clientDetails = AdsModel.find(clientId);
-            //     res.status(200).json({
-            //         UserData:foundUser,
-            //         UserCampaigns:clientDetails
-            //     });
-            //   } catch (err) {
-            //     res.status(500).json({ message: "Error Occured while getting userCampaigns", error: err });
-            //   } 
             res.status(200).json(foundUser);
         } else {
          res.status(200).json("No User Found");

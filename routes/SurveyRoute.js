@@ -4,25 +4,25 @@ const SurveyController = require('../controllers/SurveyController');
 const checkToken = require('../middleware/auth');
 
 // Create a new survey
-router.post('/', SurveyController.createSurvey);
+router.post('/addSurvey', SurveyController.createSurvey);
 
 // Get a list of all surveys
-router.get('/', SurveyController.getSurveys);
+router.get('/getAll', SurveyController.getSurveys);
 
 // Get all surveys created by a specific client
-router.get('/client/',checkToken,  SurveyController.getSurveysByclient);
+router.get('/client/:id',  SurveyController.getSurveysByclient);
 
 // Get a single survey by ID
-router.get('/:surveyId', SurveyController.findOne);
+router.get('/singleSurvey/:surveyId', SurveyController.findOne);
 
 // Update a survey by ID
-router.put('/:surveyId',  SurveyController.update);
+router.put('/updateSurvey/:surveyId',  SurveyController.update);
 
 // Delete a survey by ID
-router.delete('/:surveyId', SurveyController.delete);
+router.delete('/deleteSurvey/:surveyId', SurveyController.delete);
 
 // delete all survey
-router.delete('/', SurveyController.deleteAllSurveys);
+router.delete('/deleteAll', SurveyController.deleteAllSurveys);
 
 //delete particular client survey
 router.delete('/client/removeS',  SurveyController.deleteSurvey );
@@ -47,5 +47,8 @@ router.get('/:surveyId/analysis', SurveyController.getSurveyAnalysis);
 //active and inactive the survey mainly for admin
 router.put('/:id/status', SurveyController.updateStatusSurvey);
 
+router.put('/verifyStatus/:id', SurveyController.verifyStatus);
+router.put('/stopStatus/:id', SurveyController.stopStatus);
+router.put('/expiredStatus/:id', SurveyController.expireStatus);
 module.exports = router;
 

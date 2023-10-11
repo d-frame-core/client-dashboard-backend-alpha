@@ -54,7 +54,7 @@ app.use('/ads', AdsRoute);
 app.use('/users', UsersRoute);
 app.use('/dframeUser', DframeUser);
 app.use('/survey', SurveyRoute);
-app.use('/auth', AuthRoute);
+app.use('/auth', AuthRoute); 
 app.use('/LearnMore', LearnMoreRoute);//admin done
 app.use('/Help', HelpRoute);//admin done
 app.use('/F&Q', FaqRoute);//admin done

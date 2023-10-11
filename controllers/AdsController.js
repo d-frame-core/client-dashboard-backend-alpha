@@ -21,6 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
 const getAd = async (req, res) => {
     try {
         const foundAd = await Ad.find({adId: req.params.id}) 
@@ -47,8 +48,6 @@ const getAllAd = async (req, res) => {
 
 const postAd = async (req, res) => {
     const newAd = new Ad({
-
-        // uuid // nanoid
         clientId: req.body.clientId,
         sessionId: req.body.sessionId,
         campaignName: req.body.campaignName,
@@ -151,6 +150,52 @@ const adminUpdateAd = (req, res) => {
     }
 }
 
+async function verifyStatus(req, res) {
+    try {
+      // Find the ad by its ID
+      const adId = req.params.id; // Assuming you pass the ad ID as a route parameter
+      const ad = await Ad.findById(adId);
+  
+      if (!ad) {
+        return res.status(404).json({ message: 'Ad not found' });
+      }
+  
+      // Update the status to "verified"
+      ad.status = 'verified';
+      
+      // Save the updated ad
+      await ad.save();
+  
+      return res.status(200).json({ message: 'Status updated to verified' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  async function pausedStatus(req, res) {
+    try {
+      // Find the ad by its ID
+      const adId = req.params.id; // Assuming you pass the ad ID as a route parameter
+      const ad = await Ad.findById(adId);
+  
+      if (!ad) {
+        return res.status(404).json({ message: 'Ad not found' });
+      }
+  
+      // Update the status to "verified"
+      ad.status = 'paused';
+      
+      // Save the updated ad
+      await ad.save();
+  
+      return res.status(200).json({ message: 'Status updated to verified' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
 module.exports = {
-    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails, adminUpdateAd, getAllAd
+    getAd, postAd, updateAd, deleteAd, upload, getAllClientDetails, adminUpdateAd, getAllAd, verifyStatus, pausedStatus
 }

@@ -34,6 +34,23 @@ const learnMoreData = [
       res.status(500).json({ error: error.message });
     }
   };
+
+  exports.createSingleLearnUser = async (req, res) => {
+    try {
+      const { title, text } = req.body; // Assuming your request body contains title and text properties
+  
+      if (!title || !text) {
+        return res.status(400).json({ error: 'Both title and text are required' });
+      }
+  
+      const learnUser = new LearnUser({ title, text });
+      await learnUser.save();
+  
+      res.status(201).json(learnUser);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
   
   exports.getAllLearnUser = async (req, res) => {
     try {
@@ -48,6 +65,22 @@ const learnMoreData = [
     try {
       await LearnUser.deleteMany();
       res.json({ message: "All Learns deleted successfully!" });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
+
+  exports.deleteSingleLearn = async (req, res) => {
+    try {
+      const { id } = req.params; // Assuming the ID is provided as a URL parameter
+  
+      const deletedLearnUser = await LearnUser.findByIdAndRemove(id);
+  
+      if (!deletedLearnUser) {
+        return res.status(404).json({ message: 'LearnUser not found' });
+      }
+  
+      res.json({ message: 'LearnUser deleted successfully!' });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

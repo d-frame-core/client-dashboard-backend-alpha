@@ -23,21 +23,19 @@ const surveySchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    options: [{ 
-      type: String,
-      required: true
-    }],
-    optionGroups: [{
-      option: {
+    options: [
+      {
         type: String,
-        
-      },
-      userAnswers: [{
+        required: true
+      }
+    ],
+    userAnswers: [[
+      {
         type: String,
         ref: 'User',
         
-      }]
-    }]
+      }
+    ]],
   }],
   totalRes: {
     type: Number,
@@ -49,7 +47,7 @@ const surveySchema = new mongoose.Schema({
   },
   statusCampaign: {
     type: String,
-    required: true
+    default:"unverified" //verified,unverified,stop,completed
   },
   startDate: {
     type: Date,

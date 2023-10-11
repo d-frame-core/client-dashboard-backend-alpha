@@ -18,21 +18,27 @@ const getUser = async (req, res) => {
         res.status(500).json({message: "Error Occured"})
     }
 } 
+
+const getUnverifiedUser = async (req, res) => {
+    try {
+        const activeUsers = await User.find({ status: 'unverified' });
+
+        if (activeUsers.length > 0) {
+            res.status(200).json(activeUsers);
+        } else {
+            res.status(404).json({ message: "No active users found" });
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Error occurred" });
+    }
+};
+
 //Get detail by id
 const getUserbyid = (req, res) => {
    const clientId = req.params.id
        User.findById(clientId)
       .then(foundUser => {
         if (foundUser) {
-            // try {
-            //     const clientDetails = AdsModel.find(clientId);
-            //     res.status(200).json({
-            //         UserData:foundUser,
-            //         UserCampaigns:clientDetails
-            //     });
-            //   } catch (err) {
-            //     res.status(500).json({ message: "Error Occured while getting userCampaigns", error: err });
-            //   } 
             res.status(200).json(foundUser);
         } else {
          res.status(200).json("No User Found");
@@ -55,6 +61,7 @@ const postUser = async (req, res) => {
         companyAddress1: req.body.companyAddress1,
         companyAddress2: req.body.companyAddress2,
         walletAddress: req.body.walletAddress,
+        status: req.body.status,
         
     })
     try {
@@ -66,6 +73,32 @@ const postUser = async (req, res) => {
         res.status(500).json(err)
     }
 }
+
+const toggleStatus = async (req, res) => {
+    try {
+      const { id } = req.params; // Extract the userId from request parameters
+      const { newStatus } = req.body; // Extract the newStatus from request body
+  
+      // Find the user by userId
+      const user = await User.findById(id);
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Update the status field with the newStatus
+      user.status = newStatus;
+  
+      // Save the updated user document
+      await user.save(); // Use save() instead of findByIdAndUpdate
+  
+      return res.status(200).json({ message: 'Status updated successfully' });
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
 
 const updateUser = (req, res) => {
     try {
@@ -140,7 +173,6 @@ const signupUser = async (req, res) => {
         res.status(200).json({ message: "Address already exists. Login instead." });
       } else {
         const newUser = new User({
-          userId: req.body.userId,
           companyName: req.body.companyName,
           companyType: req.body.companyType,
           companyEmail: req.body.companyEmail,
@@ -188,7 +220,9 @@ const signupUser = async (req, res) => {
             loginUser,
             checkToken,
             signupUser,
-            adminUpdateUser
+            adminUpdateUser,
+            toggleStatus,
+            getUnverifiedUser
             };
 
 

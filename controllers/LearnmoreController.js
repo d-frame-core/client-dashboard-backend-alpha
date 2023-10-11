@@ -35,6 +35,21 @@ const learnMoreData = [
     }
   };
   
+  exports.createSingleLearn = async (req, res) => {
+    try {
+      // Create a new LearnMore object using the data from the request body
+      const newLearnMore = new LearnMore(req.body);
+  
+      // Save the newLearnMore to the database
+      await newLearnMore.save();
+  
+      res.status(201).json(newLearnMore);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to create LearnMore.' });
+    }
+  };
+
   exports.getAllLearnMore = async (req, res) => {
     try {
       const learnMore = await LearnMore.find({});

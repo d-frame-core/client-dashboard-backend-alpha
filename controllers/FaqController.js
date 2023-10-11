@@ -40,6 +40,18 @@ exports.createFAQ = async (req, res) => {
     res.status(500).json({ message: 'Failed to create FAQs.' });
   }
 };
+
+exports.createSingleFAQ = async (req, res) => {
+  try {
+    const newFAQ = new FAQ(req.body); // Create a new FAQ object using the data from the request body
+    await newFAQ.save(); // Save the newFAQ to the database
+    res.status(201).json({ message: 'FAQ created successfully.', newFAQ });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to create FAQ.' });
+  }
+};
+
 exports.getAllFAQs = async (req, res) => {
     try {
       const faqs = await FAQ.find();

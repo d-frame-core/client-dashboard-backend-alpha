@@ -34,6 +34,20 @@ const HData = [
       res.status(500).json({ error: error.message });
     }
   };
+
+  exports.createSingleHelp = async (req, res) => {
+    try {
+      // Create a new HelpUser object using the data from the request body
+      const newHelpUser = new HelpUser(req.body);
+      
+      // Save the newHelpUser to the database
+      await newHelpUser.save();
+      
+      res.status(201).json(newHelpUser);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
   
   exports.getAllhelp = async (req, res) => {
     try {
@@ -44,24 +58,47 @@ const HData = [
     }
   };
 
+
+  //delete All
   exports.delete = async (req, res) => {
     try {
       await HelpUser.deleteMany();
       res.json({ message: " deleted successfully!" });
-    } catch (err) {
+    } catch (err) { 
       res.status(500).json({ message: err.message });
     }
   };
-  exports.updateHelp = async (req, res) => {
+
+  //delete single 
+  exports.deleteById = async (req, res) => {
+    const id = req.params.id;
+  
     try {
-      const HelpUser = await HelpUser.findByIdAndUpdate(req.params.id, req.body, {
+      const deletedHelpUser = await HelpUser.findByIdAndDelete(id);
+  
+      if (!deletedHelpUser) {
+        return res.status(404).json({ error: "HelpUser not found" });
+      }
+  
+      res.json({ message: "Deleted successfully!" });
+    } catch (err) {
+      console.error(err); // Log the error for debugging
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  //single help update
+  exports.updateHelp = async (req, res) => {
+    console.log(req.body,req.params.id)
+    try {
+      const helpUser = await HelpUser.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
       });
-      if (!HelpUser) {
+      if (!helpUser) {
         return res.status(404).json({ error: " not found" });
       }
-      res.status(200).json(HelpUser);
+      res.status(200).json(helpUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -69,11 +106,11 @@ const HData = [
   
   exports.gethelpById = async (req, res) => {
     try {
-      const HelpUser = await HelpUser.findById(req.params.id);
-      if (!HelpUser) {
+      const helpUser = await HelpUser.findById(req.params.id);
+      if (!helpUser) {
         return res.status(404).json({ message: " entry not found" });
       }
-      res.status(200).json(HelpUser);
+      res.status(200).json(helpUser);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

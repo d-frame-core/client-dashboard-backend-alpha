@@ -17,8 +17,10 @@ router.delete('/admin/deleteSingle/:id', HelpController.deleteSingle);
 //user Routes
 router.get('/userHelp/getAllHelp',  UserHelpController.getAllhelp);
 router.post('/userHelp/addAllHelp',  UserHelpController.createHelp);
+router.post('/userHelp/addSingleHelp',  UserHelpController.createSingleHelp);
 router.put('/userHelp/update/:id',UserHelpController.updateHelp);
 router.delete('/userHelp/deleteAll', UserHelpController.delete);
+router.delete('/userHelp/deleteSingle/:id', UserHelpController.deleteById);
 router.get('/userHelp/helpby/:id', UserHelpController.gethelpById );
 
 module.exports = router;

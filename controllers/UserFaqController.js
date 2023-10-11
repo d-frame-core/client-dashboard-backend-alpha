@@ -40,6 +40,25 @@ exports.createFAQUser = async (req, res) => {
     res.status(500).json({ message: 'Failed to create FAQs.' });
   }
 };
+
+exports.createSingleFAQUser = async (req, res) => {
+  try {
+    const { question, answer } = req.body; 
+
+    if (!question || !answer) {
+      return res.status(400).json({ message: 'Both question and answer are required.' });
+    }
+
+    const faq = new FAQUser({ question, answer });
+    await faq.save();
+
+    res.status(201).json({ message: 'FAQ created successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to create FAQ.' });
+  }
+};
+
 exports.getAllFAQUsers = async (req, res) => {
     try {
       const faqs = await FAQUser.find();

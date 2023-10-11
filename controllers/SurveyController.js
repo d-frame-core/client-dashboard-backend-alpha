@@ -1,45 +1,15 @@
 const mongoose = require('mongoose');
 const Survey = require('../models/SurveyModel');
 
-// Create a new survey
-exports.createSurvey = async (req, res) => {
+// Create a new surveyddd
+exports.createSurvey= async (req, res) => {
   try {
-    const newSurvey = new Survey({
-      surveyName: req.body.surveyName,
-      surveyDescription: req.body.surveyDescription,
-      clientId: mongoose.Types.ObjectId(req.body.clientId), 
-      totalQues: req.body.totalQues.map((question, index) => {
-        const optionGroups = {};
-        question.optionGroups.forEach((group) => {
-          const selectedOption = group.option;
-          const userAnswers = group.userAnswers || [];
-          if (!optionGroups[selectedOption]) {
-            //optionGroups[selectedOption] = { option: selectedOption, userAnswers: userAnswers || [] };
-
-            optionGroups[selectedOption] = { option: selectedOption, userAnswers: [] };
-          }
-          optionGroups[selectedOption].userAnswers.push(...userAnswers);
-        });
-        return {
-          questionNumber: index + 1,
-          title: question.title,
-          options: question.options,
-          optionGroups: Object.values(optionGroups),
-        };
-      }),
-      totalRes: req.body.totalRes,
-      totalReward: req.body.totalReward,
-      statusCampaign: req.body.statusCampaign,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
-    });
-    const savedSurvey = await newSurvey.save();
-    res.json({ message: 'Survey created successfully', data: savedSurvey });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const survey = await Survey.create(req.body);
+    res.status(201).json(survey);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
-
 // Get all surveys created by a particular client
 /*exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;
@@ -64,10 +34,7 @@ exports.getSurveysByclient = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
-
-    
-    
+}  
    
 // Get all surveys
 exports.getSurveys = async (req, res) => {
@@ -77,13 +44,6 @@ exports.getSurveys = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-};
-
-// Get a single survey
-
-
-exports.getSurvey = async (req, res) => {
-  res.json(res.survey);
 };
 
 exports.getSurveyAnalysis = async (req, res) => {
@@ -153,8 +113,6 @@ exports.getExpiredSurveysByclientid = async (req, res) => {
   }
 };
 
-
-
 exports.getExpiredSurveyById = async (req, res) => {
   const surveyId = req.params.id;
   try {
@@ -170,7 +128,6 @@ exports.getExpiredSurveyById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 // Update a survey
 exports.update = (req, res) => {
@@ -195,7 +152,78 @@ exports.update = (req, res) => {
     });
 };
 
-// Delete a survey
+//verify status
+exports.verifyStatus=async(req, res)=> {
+  try {
+    // Find the ad by its ID
+    const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
+    const survey = await Survey.findById(surveyId);
+
+    if (!survey) {
+      return res.status(404).json({ message: 'Ad not found' });
+    }
+
+    // Update the status to "verified"
+    survey.statusCampaign = 'verified';
+    
+    // Save the updated ad
+    await survey.save();
+
+    return res.status(200).json({ message: 'Status updated to verified' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+//pause status
+exports.stopStatus=async(req, res)=> {
+  try {
+    // Find the ad by its ID
+    const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
+    const survey = await Survey.findById(surveyId);
+
+    if (!survey) {
+      return res.status(404).json({ message: 'Ad not found' });
+    }
+
+    // Update the status to "verified"
+    survey.statusCampaign = 'stop';
+    
+    // Save the updated ad
+    await survey.save();
+
+    return res.status(200).json({ message: 'Status updated to verified' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+//expired status
+exports.expireStatus=async(req, res)=> {
+  try {
+    // Find the ad by its ID
+    const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
+    const survey = await Survey.findById(surveyId);
+
+    if (!survey) {
+      return res.status(404).json({ message: 'Ad not found' });
+    }
+
+    // Update the status to "verified"
+    survey.statusCampaign = 'expired';
+    
+    // Save the updated ad
+    await survey.save();
+
+    return res.status(200).json({ message: 'Status updated to verified' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 // Delete a survey with the specified surveyId in the request
 exports.delete = (req, res) => {
   Survey.findByIdAndRemove(req.params.surveyId)
@@ -218,6 +246,7 @@ exports.delete = (req, res) => {
       });
     });
 };
+
 //delete particulr survey of client
 exports.deleteSurvey = async (req, res) => {
   const clientId = req.headers.clientid;
@@ -245,6 +274,7 @@ exports.deleteAllSurveys = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 //delete expired survey of a particular client
 exports.deleteExpiredSurveys = async (req, res) => {
   const clientId = req.headers.clientid;
@@ -265,8 +295,6 @@ exports.deleteExpiredSurveys = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-
 
 //  function to get survey by ID
 exports.findOne = (req, res) => {
@@ -301,6 +329,7 @@ exports.findOne = (req, res) => {
       });
     });
 };
+
 exports.updateStatusSurvey = async (req, res) => {
   try {
     const survey = await Survey.findById(req.params.id);

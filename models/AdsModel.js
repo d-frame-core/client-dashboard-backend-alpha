@@ -27,7 +27,11 @@ const adSchema = new mongoose.Schema({
     staus: String,
     tags: [],
     assignedUsers: Number,
-    users: []
+    users: [],
+    status:{
+        type:String,
+        default:"unverified"
+    }
 });
 
 module.exports = new mongoose.model("Ad", adSchema)

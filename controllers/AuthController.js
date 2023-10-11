@@ -4,6 +4,8 @@ require("dotenv").config();
 const Admin = require("../models/AdminModel");
 const bcrypt = require("bcryptjs");
 
+const jwtSecretKey = 'dframeAdmin';
+
 // Generate JWT token
 exports.generateToken = function (user) {
   const jwt = require("jsonwebtoken");
@@ -91,5 +93,20 @@ exports.verifyToken = function (token) {
     return decoded;
   } catch (err) {
     return null;
+  }
+};
+
+
+exports.adminLogin = (req, res) => {
+  const {userAddress,password} = req.body;
+
+  // Add your logic for verifying the user's address and generating a JWT token
+  // ...
+
+  if (password==="admin"&&userAddress==="0x298ab03DD8D59f04b2Fec7BcC75849bD685eea75") {
+    const token = jwt.sign({ userAddress }, jwtSecretKey, { expiresIn: '24h' });
+    res.status(200).json({token, userAddress });
+  } else {
+    res.status(403).json({ message: 'Unauthorized' });
   }
 };
