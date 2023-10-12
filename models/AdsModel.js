@@ -1,3 +1,5 @@
+/** @format */
+
 const mongoose = require('mongoose');
 
 const adSchema = new mongoose.Schema({
@@ -37,4 +39,4 @@ const adSchema = new mongoose.Schema({
     }
 });
 
-module.exports = new mongoose.model("Ad", adSchema)
+module.exports = new mongoose.model('Ad', adSchema);
