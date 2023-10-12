@@ -50,6 +50,7 @@ exports.getAllProfilePictures = (req, res) => {
     res.status(200).json({ data: profiles });
   });
 };
+
 // Get a single profile picture from the database by _id
 exports.getProfilePictureById = (req, res) => {
   Profile.findById(req.params.id, (err, profile) => {
