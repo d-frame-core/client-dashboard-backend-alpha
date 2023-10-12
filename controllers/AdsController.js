@@ -236,7 +236,10 @@ const testCreateAd = async (req, res) => {
     // Upload the image to GCS
     if (req.file) {
       const bucket = storageClient.bucket(bucketName);
-      const filename = `${Date.now()}-${originalFilename.replace(/ /g, '_')}`; // Replace spaces with underscores
+      const filename = `${Date.now()}-${req.file.originalname.replace(
+        / /g,
+        '_'
+      )}`; // Replace spaces with underscores
       const file = bucket.file(filename);
       const blobStream = file.createWriteStream();
 
