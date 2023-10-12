@@ -5,6 +5,7 @@ const Ad = require("../models/AdsModel");
 const multer = require('multer');
 const path = require('path');
 const User = require('../models/UsersModel');
+const DframeUser = require('../models/DframeUserModel');
 
 let fileName
 
@@ -64,30 +65,41 @@ const postAd = async (req, res) => {
             ageTo: req.body.ageTo,
             gender: req.body.gender
         },
-        image: fileName,
+        image: req.body.image,
         adContent: req.body.adContent,
-        tags: req.body.tags
+        tags: req.body.tags,
+        perDay:req.body.perDay,
+        totalDays:req.body.totalDays,
+        bidAmount:req.body.bidAmount,
+
     })
     try {
         const savedAd = await newAd.save();
-
-        const matchingUser = await User.find({
-            tags: {
-                $in: savedAd.tags
-            }
-        })
-
-        console.log(matchingUser);
-        
-        const matchedUserIds = []
-
-        matchingUser.forEach((user) => { 
-            matchedUserIds.push(user._id)
-        })
-
-        await Ad.updateOne({_id: savedAd._id}, {$set: {users: matchedUserIds}})
-
-        res.status(201).json({message: "Post created successfully", id: savedAd._id})
+        let totalUser=newAd.perDay/newAd.bidAmount;
+        let DframeUsers= await DframeUser.find() ;
+        let matcheDframeUserIds = []
+        let i=0;
+        // while(totalUser>0){
+            // const filteredUsers = DframeUsers.filter(duser => {
+            //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
+            //   })
+            DframeUsers.forEach((duser) => { 
+                const userAdIndex = duser.userAds.findIndex((entry) => entry.date === newAd.startDate);
+                if (userAdIndex !== -1) {
+                    // User has an entry for today's date, push the new 
+                    duser.userAds[userAdIndex].ads.push({ adsId: savedAd._id, rewards: newAd.bidAmount });
+                } else {
+                    // User doesn't have an entry for today's date, create a new entry
+                    duser.userAds.push({ date: newAd.startDate, ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }] });
+                }
+                // Save the updated user data
+                duser.save();
+                matcheDframeUserIds.push(duser._id);
+                totalUser--;
+            })
+            i++;
+        // }
+        res.status(201).json({message: "Post created successfully", id: matcheDframeUserIds})
     } catch (err){
         console.log(err);
         res.status(400).json({message: "Some error occured"})

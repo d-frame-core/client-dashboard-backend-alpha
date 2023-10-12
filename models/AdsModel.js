@@ -28,6 +28,9 @@ const adSchema = new mongoose.Schema({
     tags: [],
     assignedUsers: Number,
     users: [],
+    perDay: Number,
+    totalDays: Number,
+    bidAmount: Number,
     status:{
         type:String,
         default:"unverified"
