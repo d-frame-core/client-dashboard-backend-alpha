@@ -224,6 +224,9 @@ const testCreateAd = async (req, res) => {
       status,
       tags,
       adUrl,
+      perDay,
+     totalDays,
+     bidAmount,
     } = req.body;
 
     // Create a new ad instance
@@ -238,10 +241,14 @@ const testCreateAd = async (req, res) => {
       adUrl,
       status,
       tags,
+      perDay,
+     totalDays,
+     bidAmount,
     });
-
+    let savedAd;
     // Upload the image to GCS
     if (req.file) {
+      const originalFilename = req.file.originalname;
       const bucket = storageClient.bucket(bucketName);
       const filename = `${Date.now()}-${originalFilename.replace(/ /g, '_')}`; // Replace spaces with underscores
       const file = bucket.file(filename);
@@ -257,16 +264,46 @@ const testCreateAd = async (req, res) => {
         newAd.image = `https://storage.cloud.google.com/${bucketName}/${filename}?authuser=2`;
 
         // Save the ad to the database
-        await newAd.save();
-        return res.status(201).json(newAd);
-      });
+        savedAd = await newAd.save();
 
+      });
       blobStream.end(req.file.buffer);
     } else {
       // Save the ad without an image
-      await newAd.save();
-      return res.status(201).json(newAd);
+      savedAd = await newAd.save();
     }
+
+    try {
+       let totalUser=newAd.perDay/newAd.bidAmount;
+        let DframeUsers= await DframeUser.find() ;
+        let matcheDframeUserIds = []
+        let i=0;
+        // while(totalUser>0){
+            // const filteredUsers = DframeUsers.filter(duser => {
+            //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
+            //   })
+            DframeUsers.forEach((duser) => { 
+                const userAdIndex = duser.userAds.findIndex((entry) => entry.date === newAd.startDate);
+                if (userAdIndex !== -1) {
+                    // User has an entry for today's date, push the new 
+                    duser.userAds[userAdIndex].ads.push({ adsId: savedAd._id, rewards: newAd.bidAmount });
+                } else {
+                    // User doesn't have an entry for today's date, create a new entry
+                    duser.userAds.push({ date: newAd.startDate, ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }] });
+                }
+                // Save the updated user data
+                duser.save();
+                matcheDframeUserIds.push(duser._id);
+                totalUser--;
+            })
+            i++;
+        // }
+            res.status(201).json({message: "Post created successfully", id: matcheDframeUserIds})
+        } catch (err){
+            console.log(err);
+            res.status(400).json({message: "Some error occured"})
+        }
+
   } catch (error) {
     console.log('ERROR in CATCH', error);
     return res.status(500).json({ error: 'Error creating ad' });
