@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 
+// Define a string enum for KYC statuses
+
 const dFrameUserSchema = new mongoose.Schema(
   {
     publicAddress: { type: String, required: true, unique: true },
     address: {
       data: { type: String, default: '' },
       submitted: { type: Boolean, default: false },
-      verified: { type: Boolean, default: false },
       addressProof: { type: Object },
     },
     referralCode: { type: String, default: '' },
     kyc1: {
-      status: { type: Boolean, default: false },
-      verified: { type: Boolean, default: false },
+      status: {
+        type: String,
+        default: "unverified",
+      },
       details: {
         firstName: { type: String, default: '' },
         lastName: { type: String, default: '' },
@@ -22,8 +25,10 @@ const dFrameUserSchema = new mongoose.Schema(
       },
     },
     kyc2: {
-      status: { type: Boolean, default: false },
-      verified: { type: Boolean, default: false },
+      status: {
+        type: String,
+        default:"unverified"
+      },
       details: {
         gender: { type: String, default: '' },
         country: { type: String, default: '' },
@@ -34,15 +39,16 @@ const dFrameUserSchema = new mongoose.Schema(
         pincode: { type: String, default: '' },
         dob: { type: String, default: '' },
         annualIncome: { type: String, default: '' },
-        permanentAddress: { type: String, default: '' },
       },
     },
     kyc3: {
-      status: { type: Boolean, default: false },
-      verified: { type: Boolean, default: false },
-      governmentProof1: { type: Object }, // New governmentProof1 field
-      governmentProof2: { type: Object }, // New governmentProof2 field
-      userPhoto: { type: Object }, // New userPhoto field
+      status: {
+        type: String,
+        default:"unverified"
+      },
+      governmentProof1: { type: Object },
+      governmentProof2: { type: Object },
+      userPhoto: { type: Object },
     },
     permissions: {
       location: { type: Boolean, default: true },
@@ -50,9 +56,70 @@ const dFrameUserSchema = new mongoose.Schema(
       callDataSharing: { type: Boolean, default: true },
       emailSharing: { type: Boolean, default: true },
       notification: { type: Boolean, default: true },
-      storageOption: { type: String, enum: ['GCP', 'IPFS'], default: 'GCP' },
+      storageOption: { type: String, default: 'GCP' },
     },
     profileImage: { type: Object },
+    userData: [
+      {
+        dataDate: String,
+        urlData: [
+          {
+            urlLink: String, // Change this to a regular array
+            timestamps: [String], // Change this to a regular array
+            tags: [String], // Change this to a regular array
+            timespent: [Number],
+          },
+        ],
+      },
+    ],
+    rewards: {
+      verificationRewards: {
+        reward: { type: Number },
+        timestamp: { type: [String] },
+        rewardCategory: { type: [String] },
+        status: { type: String, default: 'unpaid' },
+      },
+      // dailyRewards: {
+      //   browserDataRewards: {
+      //     reward: { type: Number },
+      //     timestamp: { type: [String] },
+      //     status: { type: String, default: 'unpaid' },
+      //   },
+      //   adRewards: {
+      //     reward: { type: Number },
+      //     adIds: { type: [String] },
+      //     timestamp: { type: [String] },
+      //     status: { type: String, default: 'unpaid' },
+      //   },
+      //   emailDataRewards: {
+      //     reward: { type: Number },
+      //     timestamp: { type: [String] },
+      //     status: { type: String, default: 'unpaid' },
+      //   },
+      //   callDataRewards: {
+      //     reward: { type: Number },
+      //     timestamp: { type: [String] },
+      //     status: { type: String, default: 'unpaid' },
+      //   },
+      //   referralRewards: {
+      //     reward: { type: Number },
+      //     timestamp: { type: [String] },
+      //     referrals: { type: [String] ,default: 'unpaid' },
+      //   },
+      // },
+    },
+    userAds: [
+      {
+        date: { type: String },
+        ads: [
+          {
+            adsId: { type: String },
+            rewards: { type: Number },
+            status: { type: String, default: "unseen" },
+          },
+        ],
+      },
+    ],
   },
   {
     timestamps: true,
@@ -66,9 +133,7 @@ const dFrameUserSchema = new mongoose.Schema(
   }
 );
 
-const DFrameUser = mongoose.model(
-  'DFrameUser',
-  dFrameUserSchema
-);
+// Create a mongoose model for DFrameUser
+const DFrameUser = mongoose.model('DFrameUser', dFrameUserSchema);
 
-module.exports = DFrameUser;
+module.exports =  DFrameUser;

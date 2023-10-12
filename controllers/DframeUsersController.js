@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
-const User = require('../models/DframeUserModel');
+const DframeUser = require('../models/DframeUserModel');
 require('dotenv').config()
 
 //Get all detail
 const getUser = async (req, res) => {
     try {
-        const foundUser = await User.find()
+        const foundUser = await DframeUser.find()
+        console.log("checking for user")
+
         if(foundUser) {
             res.status(200).json(foundUser)
         } else {
@@ -20,7 +22,7 @@ const getUser = async (req, res) => {
 //Get detail by id
 const getUserbyid = (req, res) => {
    const clientId = req.params.id
-       User.findById(clientId)
+   DframeUser.findById(clientId)
       .then(foundUser => {
         if (foundUser) {
             res.status(200).json(foundUser);
@@ -36,7 +38,7 @@ const getUserbyid = (req, res) => {
 
 const updateUser = (req, res) => {
     try {
-        User.updateOne(
+        DframeUser.updateOne(
             {_id: req.params.id},
             {$set: req.body},
             (err) => {
@@ -52,7 +54,7 @@ const updateUser = (req, res) => {
 
 const deleteUser = (req, res) => {
     try {
-        User.deleteOne({userId: req.params.id}, (err) => {
+        DframeUser.deleteOne({userId: req.params.id}, (err) => {
             if(!err) {
                 res.status(200).json("Deleted Successfully");
             }
@@ -66,7 +68,7 @@ const deleteUser = (req, res) => {
 
   const adminUpdateUser = (req, res) => {
     try {
-        User.updateOne(
+        DframeUser.updateOne(
             {_id: req.params.id},
             {$set:{ Status: req.body.status }},
             (err) => {
