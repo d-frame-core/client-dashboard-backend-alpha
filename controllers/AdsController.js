@@ -47,63 +47,72 @@ const getAllAd = async (req, res) => {
 };
 
 const postAd = async (req, res) => {
-    const newAd = new Ad({
-        clientId: req.body.clientId,
-        sessionId: req.body.sessionId,
-        campaignName: req.body.campaignName,
-        campaignType: req.body.campaignType,
-        adName: req.body.adName,
-        socialMediaPages: req.body.socialMediaPages,
-        startDate: req.body.startDate,
-        startTime: req.body.startTime,
-        endDate: req.body.endDate,
-        endTime: req.body.endTime,
-        audience: {
-            location: req.body.location,
-            ageFrom: req.body.ageFrom,
-            ageTo: req.body.ageTo,
-            gender: req.body.gender
-        },
-        image: req.body.image,
-        adContent: req.body.adContent,
-        tags: req.body.tags,
-        perDay:req.body.perDay,
-        totalDays:req.body.totalDays,
-        bidAmount:req.body.bidAmount,
-
-    })
-    try {
-        const savedAd = await newAd.save();
-        let totalUser=newAd.perDay/newAd.bidAmount;
-        let DframeUsers= await DframeUser.find() ;
-        let matcheDframeUserIds = []
-        let i=0;
-        // while(totalUser>0){
-            // const filteredUsers = DframeUsers.filter(duser => {
-            //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
-            //   })
-            DframeUsers.forEach((duser) => { 
-                const userAdIndex = duser.userAds.findIndex((entry) => entry.date === newAd.startDate);
-                if (userAdIndex !== -1) {
-                    // User has an entry for today's date, push the new 
-                    duser.userAds[userAdIndex].ads.push({ adsId: savedAd._id, rewards: newAd.bidAmount });
-                } else {
-                    // User doesn't have an entry for today's date, create a new entry
-                    duser.userAds.push({ date: newAd.startDate, ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }] });
-                }
-                // Save the updated user data
-                duser.save();
-                matcheDframeUserIds.push(duser._id);
-                totalUser--;
-            })
-            i++;
-        // }
-        res.status(201).json({message: "Post created successfully", id: matcheDframeUserIds})
-    } catch (err){
-        console.log(err);
-        res.status(400).json({message: "Some error occured"})
-    }
-}
+  const newAd = new Ad({
+    clientId: req.body.clientId,
+    sessionId: req.body.sessionId,
+    campaignName: req.body.campaignName,
+    campaignType: req.body.campaignType,
+    adName: req.body.adName,
+    socialMediaPages: req.body.socialMediaPages,
+    startDate: req.body.startDate,
+    startTime: req.body.startTime,
+    endDate: req.body.endDate,
+    endTime: req.body.endTime,
+    audience: {
+      location: req.body.location,
+      ageFrom: req.body.ageFrom,
+      ageTo: req.body.ageTo,
+      gender: req.body.gender,
+    },
+    image: req.body.image,
+    adContent: req.body.adContent,
+    tags: req.body.tags,
+    perDay: req.body.perDay,
+    totalDays: req.body.totalDays,
+    bidAmount: req.body.bidAmount,
+  });
+  try {
+    const savedAd = await newAd.save();
+    let totalUser = newAd.perDay / newAd.bidAmount;
+    let DframeUsers = await DframeUser.find();
+    let matcheDframeUserIds = [];
+    let i = 0;
+    // while(totalUser>0){
+    // const filteredUsers = DframeUsers.filter(duser => {
+    //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
+    //   })
+    DframeUsers.forEach((duser) => {
+      const userAdIndex = duser.userAds.findIndex(
+        (entry) => entry.date === newAd.startDate
+      );
+      if (userAdIndex !== -1) {
+        // User has an entry for today's date, push the new
+        duser.userAds[userAdIndex].ads.push({
+          adsId: savedAd._id,
+          rewards: newAd.bidAmount,
+        });
+      } else {
+        // User doesn't have an entry for today's date, create a new entry
+        duser.userAds.push({
+          date: newAd.startDate,
+          ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }],
+        });
+      }
+      // Save the updated user data
+      duser.save();
+      matcheDframeUserIds.push(duser._id);
+      totalUser--;
+    });
+    i++;
+    // }
+    res
+      .status(201)
+      .json({ message: 'Post created successfully', id: matcheDframeUserIds });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: 'Some error occured' });
+  }
+};
 
 const updateAd = (req, res) => {
   try {
@@ -225,8 +234,8 @@ const testCreateAd = async (req, res) => {
       tags,
       adUrl,
       perDay,
-     totalDays,
-     bidAmount,
+      totalDays,
+      bidAmount,
     } = req.body;
 
     // Create a new ad instance
@@ -242,8 +251,8 @@ const testCreateAd = async (req, res) => {
       status,
       tags,
       perDay,
-     totalDays,
-     bidAmount,
+      totalDays,
+      bidAmount,
     });
     let savedAd;
     // Upload the image to GCS
@@ -268,45 +277,54 @@ const testCreateAd = async (req, res) => {
 
         // Save the ad to the database
         savedAd = await newAd.save();
-
+        console.log(savedAd);
       });
       blobStream.end(req.file.buffer);
     } else {
       // Save the ad without an image
       savedAd = await newAd.save();
     }
-
     try {
-       let totalUser=newAd.perDay/newAd.bidAmount;
-        let DframeUsers= await DframeUser.find() ;
-        let matcheDframeUserIds = []
-        let i=0;
-        // while(totalUser>0){
-            // const filteredUsers = DframeUsers.filter(duser => {
-            //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
-            //   })
-            DframeUsers.forEach((duser) => { 
-                const userAdIndex = duser.userAds.findIndex((entry) => entry.date === newAd.startDate);
-                if (userAdIndex !== -1) {
-                    // User has an entry for today's date, push the new 
-                    duser.userAds[userAdIndex].ads.push({ adsId: savedAd._id, rewards: newAd.bidAmount });
-                } else {
-                    // User doesn't have an entry for today's date, create a new entry
-                    duser.userAds.push({ date: newAd.startDate, ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }] });
-                }
-                // Save the updated user data
-                duser.save();
-                matcheDframeUserIds.push(duser._id);
-                totalUser--;
-            })
-            i++;
-        // }
-            res.status(201).json({message: "Post created successfully", id: matcheDframeUserIds})
-        } catch (err){
-            console.log(err);
-            res.status(400).json({message: "Some error occured"})
+      let totalUser = newAd.perDay / newAd.bidAmount;
+      let DframeUsers = await DframeUser.find();
+      let matcheDframeUserIds = [];
+      let i = 0;
+      // while(totalUser>0){
+      // const filteredUsers = DframeUsers.filter(duser => {
+      //     return duser.userAds.some(adsObj => adsObj.ads.length === 0);
+      //   })
+      DframeUsers.forEach((duser) => {
+        const userAdIndex = duser.userAds.findIndex(
+          (entry) => entry.date === newAd.startDate
+        );
+        if (userAdIndex !== -1) {
+          // User has an entry for today's date, push the new
+          duser.userAds[userAdIndex].ads.push({
+            adsId: savedAd._id,
+            rewards: newAd.bidAmount,
+          });
+        } else {
+          // User doesn't have an entry for today's date, create a new entry
+          duser.userAds.push({
+            date: newAd.startDate,
+            ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }],
+          });
         }
-
+        // Save the updated user data
+        duser.save();
+        matcheDframeUserIds.push(duser._id);
+        totalUser--;
+      });
+      i++;
+      // }
+      res.status(201).json({
+        message: 'Post created successfully',
+        id: matcheDframeUserIds,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ message: 'Some error occured' });
+    }
   } catch (error) {
     console.log('ERROR in CATCH', error);
     return res.status(500).json({ error: 'Error creating ad' });
