@@ -4,7 +4,7 @@ const Help = require(path.join(__dirname, '..', 'models', 'HelpModel'));
 
 const HData = [
     {
-        title: "Read More",
+        title: "Read More", 
         text: "Details will be added in due time.",
       },
       {
