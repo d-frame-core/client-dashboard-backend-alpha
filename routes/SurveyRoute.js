@@ -4,7 +4,6 @@ const router = express.Router();
 
 // Convert the relative paths to absolute paths
 const SurveyController = require(path.join(__dirname, '..', 'controllers', 'SurveyController'));
-const checkToken = require(path.join(__dirname, '..', 'middleware', 'auth'));
 
 // Create a new survey
 router.post('/addSurvey', SurveyController.createSurvey);
