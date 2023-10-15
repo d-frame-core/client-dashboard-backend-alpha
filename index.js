@@ -11,7 +11,7 @@ const start = async () => {
   } catch (err) {
     console.error(err);
   }
-  app.listen(8000, () => {
+  app.listen(80, () => {
     console.log("App Started");
   });
 };
