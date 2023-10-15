@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-const DframeUser = require('../models/DframeUserModel');
-require('dotenv').config()
+const path = require('path'); // Import the path module
+const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
+require('dotenv').config();
+
 
 //Get all detail
 const getUser = async (req, res) => {

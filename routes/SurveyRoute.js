@@ -1,7 +1,10 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const SurveyController = require('../controllers/SurveyController');
-const checkToken = require('../middleware/auth');
+
+// Convert the relative paths to absolute paths
+const SurveyController = require(path.join(__dirname, '..', 'controllers', 'SurveyController'));
+const checkToken = require(path.join(__dirname, '..', 'middleware', 'auth'));
 
 // Create a new survey
 router.post('/addSurvey', SurveyController.createSurvey);

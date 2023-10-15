@@ -1,11 +1,15 @@
 /** @format */
 
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const controller = require('../controllers/AdsController');
+
+// Convert relative paths to absolute paths
+const controller = require(path.join(__dirname, '..', 'controllers', 'AdsController'));
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
 router.post('/test/createAd', upload.single('image'), controller.testCreateAd);
 router.get('/:id', controller.getAd);
 router.get('/clientAllAds/:id', controller.getAllClientDetails);

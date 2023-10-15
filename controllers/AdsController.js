@@ -2,12 +2,11 @@
 
 // AD history
 // Analytics
-
-const Ad = require('../models/AdsModel');
-const multer = require('multer');
 const path = require('path');
-const User = require('../models/UsersModel');
-const DframeUser = require('../models/DframeUserModel');
+const Ad = require(path.join(__dirname, '..', 'models', 'AdsModel'));
+const multer = require('multer');
+const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
 
 let fileName;
 

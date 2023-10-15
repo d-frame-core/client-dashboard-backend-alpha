@@ -1,7 +1,9 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const controller = require('../controllers/UsersController');
 
+// Convert the relative path to an absolute path
+const controller = require(path.join(__dirname, '..', 'controllers', 'UsersController'));
 
 router.post("/login", controller.loginUser);
 router.post("/signup", controller.signupUser);

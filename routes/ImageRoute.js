@@ -1,8 +1,11 @@
 
 const express = require('express');
 const multer = require('multer');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const profileController = require('../controllers/ImageController');
+
+// Convert the relative path to an absolute path
+const profileController = require(path.join(__dirname, '..', 'controllers', 'ImageController'));
 
 
 const storage = multer.diskStorage({

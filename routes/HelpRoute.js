@@ -1,7 +1,10 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const HelpController = require('../controllers/HelpController');
-const UserHelpController = require('../controllers/UserHelpController');
+
+// Convert the relative paths to absolute paths
+const HelpController = require(path.join(__dirname, '..', 'controllers', 'HelpController'));
+const UserHelpController = require(path.join(__dirname, '..', 'controllers', 'UserHelpController'));
 
 router.get('/readAllHelp',  HelpController.getAllhelp);
 router.get('/helpby/:id', HelpController.gethelpById );

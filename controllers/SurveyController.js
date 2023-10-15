@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const Survey = require('../models/SurveyModel');
+const path = require('path'); // Import the path module
+
+const Survey = require(path.join(__dirname, '..', 'models', 'SurveyModel'));
 
 // Create a new surveyddd
 exports.createSurvey= async (req, res) => {

@@ -1,6 +1,9 @@
-const Bid = require("../models/BidsModel");
-const Ad = require("../models/AdsModel");
-const User = require("../models/UsersModel");
+const path = require('path'); // Import the path module
+
+const Bid = require(path.join(__dirname, '..', 'models', 'BidsModel'));
+const Ad = require(path.join(__dirname, '..', 'models', 'AdsModel'));
+const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+
 
 function gettingUsers(users, noOfBids, bidRank) {
   let no_of_users = users;

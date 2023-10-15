@@ -1,6 +1,9 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const controller = require('../controllers/DframeUsersController');
+
+// Convert the relative path to an absolute path
+const controller = require(path.join(__dirname, '..', 'controllers', 'DframeUsersController'));
 
 
 router.patch("/:id",controller.updateUser);

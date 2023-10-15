@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
-const Token = require("../models/TokenModel");
+const path = require('path'); // Import the path module
+const Token = require(path.join(__dirname, '..', 'models', 'TokenModel'));
 require("dotenv").config();
-const Admin = require("../models/AdminModel");
+const Admin = require(path.join(__dirname, '..', 'models', 'AdminModel'));
 const bcrypt = require("bcryptjs");
 
 const jwtSecretKey = 'dframeAdmin';

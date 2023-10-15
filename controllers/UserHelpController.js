@@ -1,4 +1,6 @@
-const HelpUser = require('../models/HelpmodelUser');
+const path = require('path'); // Import the path module
+
+const HelpUser = require(path.join(__dirname, '..', 'models', 'HelpmodelUser'));
 
 const HData = [
     {

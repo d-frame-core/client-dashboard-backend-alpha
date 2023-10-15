@@ -1,5 +1,6 @@
-const Profile = require("../models/ImageModel");
-const path = require('path');
+const path = require('path'); // Import the path module
+
+const Profile = require(path.join(__dirname, '..', 'models', 'ImageModel'));
 const fs = require('fs');
 
 const { v4: uuidv4 } = require('uuid');

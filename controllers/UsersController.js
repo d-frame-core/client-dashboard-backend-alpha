@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const User = require('../models/UsersModel');
-const AdsModel = require('../models/AdsModel');
-require('dotenv').config()
+const path = require('path'); // Import the path module
+
+const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+const AdsModel = require(path.join(__dirname, '..', 'models', 'AdsModel'));
+require('dotenv').config();
+
 
 //Get all detail
 const getUser = async (req, res) => {

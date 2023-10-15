@@ -1,12 +1,15 @@
 const express = require("express");
+const path = require("path"); // Import the path module
 const router = express.Router();
-// const authController = require("../controllers/AuthController");
-const Admin = require("../models/AdminModel");
+
+// Convert relative paths to absolute paths
+// const authController = require(path.join(__dirname, "..", "controllers", "AuthController"));
+const Admin = require(path.join(__dirname, "..", "models", "AdminModel"));
 const bcrypt = require("bcryptjs");
-const { updateMany } = require("../models/TokenModel");
+const { updateMany } = require(path.join(__dirname, "..", "models", "TokenModel"));
 const jwt = require("jsonwebtoken");
-const controller = require('../controllers/AdsController')
-const adminController = require('../controllers/AuthController')
+const adminController = require(path.join(__dirname, "..", "controllers", "AuthController"));
+
 
 // Generate JWT token route
 // router.post("/generateAdminToken", function (req, res) {

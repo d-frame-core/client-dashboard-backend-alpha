@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const { app } = require("./app");
+const path = require("path"); 
+const { app } = require(path.join(__dirname, "app"));
 require("dotenv").config();
 
 const start = async () => {

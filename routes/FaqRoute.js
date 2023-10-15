@@ -1,7 +1,10 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const FaqController = require('../controllers/FaqController');
-const UserFaqController = require('../controllers/UserFaqController');
+
+// Convert the relative paths to absolute paths
+const FaqController = require(path.join(__dirname, '..', 'controllers', 'FaqController'));
+const UserFaqController = require(path.join(__dirname, '..', 'controllers', 'UserFaqController'));
 
 // Create a new FAQ
 router.post('/addFaq', FaqController.createFAQ);

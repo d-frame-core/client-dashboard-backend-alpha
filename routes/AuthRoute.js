@@ -1,6 +1,9 @@
 const express = require("express");
+const path = require("path"); // Import the path module
 const router = express.Router();
-const authController = require("../controllers/AuthController");
+
+// Convert the relative path to an absolute path
+const authController = require(path.join(__dirname, "..", "controllers", "AuthController"));
 
 // Generate JWT token route
 router.post("/generate-token", function(req, res) {

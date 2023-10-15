@@ -2,19 +2,23 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
-const AdsRoute = require("./routes/AdsRoute");
-const FaqRoute = require("./routes/FaqRoute");
-const HelpRoute = require("./routes/HelpRoute");
-const UsersRoute = require("./routes/UsersRoute");
-const SurveyRoute = require("./routes/SurveyRoute");
-const AuthRoute = require("./routes/AuthRoute");
-const LearnMoreRoute = require("./routes/LearnMoreRoute");
-const ProfileRoute = require("./routes/ImageRoute");
-const BidsRoute = require("./routes/BidsRoute");
-const AdminRoute = require("./routes/AdminRoute");
-const DframeUser = require('./routes/DframeUser')
-const path = require("path");
+const path = require("path"); // Import the path module
+
+// Convert relative paths to absolute paths
+const AdsRoute = require(path.join(__dirname, "routes", "AdsRoute"));
+const FaqRoute = require(path.join(__dirname, "routes", "FaqRoute"));
+const HelpRoute = require(path.join(__dirname, "routes", "HelpRoute"));
+const UsersRoute = require(path.join(__dirname, "routes", "UsersRoute"));
+const SurveyRoute = require(path.join(__dirname, "routes", "SurveyRoute"));
+const AuthRoute = require(path.join(__dirname, "routes", "AuthRoute"));
+const LearnMoreRoute = require(path.join(__dirname, "routes", "LearnMoreRoute"));
+const ProfileRoute = require(path.join(__dirname, "routes", "ImageRoute"));
+const BidsRoute = require(path.join(__dirname, "routes", "BidsRoute"));
+const AdminRoute = require(path.join(__dirname, "routes", "AdminRoute"));
+const DframeUser = require(path.join(__dirname, "routes", "DframeUser"));
+
 const cookieParser = require("cookie-parser");
+
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));

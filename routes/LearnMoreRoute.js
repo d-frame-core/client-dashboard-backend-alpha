@@ -1,7 +1,10 @@
 const express = require('express');
+const path = require('path'); // Import the path module
 const router = express.Router();
-const LearnMoreController = require('../controllers/LearnmoreController');
-const UserLearnmoreController = require('../controllers/UserLearnmoreController');
+
+// Convert the relative paths to absolute paths
+const LearnMoreController = require(path.join(__dirname, '..', 'controllers', 'LearnmoreController'));
+const UserLearnmoreController = require(path.join(__dirname, '..', 'controllers', 'UserLearnmoreController'));
 
 
 router.get('/readLearnMore/',  LearnMoreController.getAllLearnMore);

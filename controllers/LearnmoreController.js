@@ -1,4 +1,7 @@
-const LearnMore = require('../models/LearnModel');
+const path = require('path'); // Import the path module
+
+const LearnMore = require(path.join(__dirname, '..', 'models', 'LearnModel'));
+
 
 const learnMoreData = [
     {

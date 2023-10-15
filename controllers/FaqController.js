@@ -1,4 +1,6 @@
-const FAQ = require('../models/FaqModel');
+const path = require('path'); // Import the path module
+
+const FAQ = require(path.join(__dirname, '..', 'models', 'FaqModel'));
 
 const questions = [
   {
