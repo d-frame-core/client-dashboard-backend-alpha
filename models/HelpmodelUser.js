@@ -12,4 +12,4 @@ const HelpUserSchema = new mongoose.Schema({
 });
 
 const HelpUser = mongoose.model('HelpUser', HelpUserSchema);
-module.exports = HelpUser;
+module.exports = HelpUser; 

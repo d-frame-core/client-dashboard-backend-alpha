@@ -12,7 +12,7 @@ const HelpSchema = new mongoose.Schema({
   pdf: {
     type: String,  // store the path or URL of the uploaded PDF file
   }
-});
+}); 
 
 const Help = mongoose.model('Help', HelpSchema);
 
