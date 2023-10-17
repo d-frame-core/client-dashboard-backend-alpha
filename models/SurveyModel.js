@@ -32,8 +32,7 @@ const surveySchema = new mongoose.Schema({
     userAnswers: [[
       {
         type: String,
-        ref: 'User',
-        
+        ref: 'User',   
       }
     ]],
   }],
