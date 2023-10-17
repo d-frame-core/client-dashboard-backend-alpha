@@ -1,3 +1,5 @@
+/** @format */
+
 const path = require('path'); // Import the path module
 
 const Profile = require(path.join(__dirname, '..', 'models', 'ImageModel'));
@@ -5,7 +7,6 @@ const fs = require('fs');
 
 const { v4: uuidv4 } = require('uuid');
 // Upload a profile picture and save it to the database
-
 
 exports.uploadProfilePicture = (req, res) => {
   if (req.file) {
@@ -23,25 +24,24 @@ exports.uploadProfilePicture = (req, res) => {
       // Generate URL for the uploaded image
       const extension = path.extname(req.file.originalname);
       const imageName = `${result._id}${extension}`;
-      const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${imageName}`;
+      const imageUrl = `${req.protocol}://${req.get(
+        'host'
+      )}/uploads/${imageName}`;
 
       // Rename the uploaded file with _id
       const newImagePath = path.join(__dirname, '..', 'uploads', imageName);
       fs.renameSync(req.file.path, newImagePath);
 
-      console.log("Image uploaded successfully. URL:", imageUrl);
+      console.log('Image uploaded successfully. URL:', imageUrl);
       res.status(200).json({
-        message: "Profile picture uploaded successfully",
+        message: 'Profile picture uploaded successfully',
         data: { imageUrl },
       });
     });
   } else {
-    return res.status(400).json({ error: "No file uploaded" });
+    return res.status(400).json({ error: 'No file uploaded' });
   }
 };
-
-
-
 
 exports.getAllProfilePictures = (req, res) => {
   Profile.find({}, (err, profiles) => {
@@ -59,10 +59,14 @@ exports.getProfilePictureById = (req, res) => {
       return res.status(400).json({ error: err });
     }
     if (!profile) {
-      return res.status(404).json({ error: "Profile picture not found" });
+      return res.status(404).json({ error: 'Profile picture not found' });
     }
 
-    const imagePath = path.join(__dirname, '../uploads', `${profile._id}-${profile.profileImage}`);
+    const imagePath = path.join(
+      __dirname,
+      '../uploads',
+      `${profile._id}-${profile.profileImage}`
+    );
 
     fs.readFile(imagePath, (err, data) => {
       if (err) {
@@ -75,7 +79,6 @@ exports.getProfilePictureById = (req, res) => {
   });
 };
 
-
 // Delete a profile picture from the database
 exports.deleteProfilePicture = (req, res) => {
   Profile.findByIdAndDelete(req.params.id, (err, result) => {
@@ -83,9 +86,9 @@ exports.deleteProfilePicture = (req, res) => {
       return res.status(400).json({ error: err });
     }
     if (!result) {
-      return res.status(404).json({ error: "Profile picture not found" });
+      return res.status(404).json({ error: 'Profile picture not found' });
     }
-    res.status(200).json({ message: "Profile picture deleted successfully" });
+    res.status(200).json({ message: 'Profile picture deleted successfully' });
   });
 };
 
@@ -97,7 +100,7 @@ exports.updateProfilePicture = (req, res) => {
         return res.status(400).json({ error: err });
       }
       if (!profile) {
-        return res.status(404).json({ error: "Profile picture not found" });
+        return res.status(404).json({ error: 'Profile picture not found' });
       }
       // profile.name = req.body.name;
       profile.profileImage.data = req.file.buffer;
@@ -106,16 +109,13 @@ exports.updateProfilePicture = (req, res) => {
         if (err) {
           return res.status(400).json({ error: err });
         }
-        res
-          .status(200)
-          .json({
-            message: "Profile picture updated successfully",
-            data: result,
-          });
+        res.status(200).json({
+          message: 'Profile picture updated successfully',
+          data: result,
+        });
       });
     });
   } else {
-    return res.status(400).json({ error: "No file uploaded" });
+    return res.status(400).json({ error: 'No file uploaded' });
   }
 };
-
