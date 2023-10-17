@@ -9,7 +9,7 @@ const UserHelpController = require(path.join(__dirname, '..', 'controllers', 'Us
 router.get('/readAllHelp',  HelpController.getAllhelp);
 router.get('/helpby/:id', HelpController.gethelpById );
 
-//for admin
+//for admin 
 router.post('/admin/addHelp',  HelpController.createHelp);
 router.post('/admin/addsingleHelp',  HelpController.createSingleHelp);
 router.put('/admin/update/:id',HelpController.updateHelp);

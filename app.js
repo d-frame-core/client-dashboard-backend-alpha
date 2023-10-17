@@ -65,5 +65,8 @@ app.use('/F&Q', FaqRoute);//admin done
 app.use("/bids", BidsRoute)
 app.use("/admin", AdminRoute)
 app.use('/uploads', express.static('uploads'), ProfileRoute);
+app.use('/', (req, res) => {
+  res.status(200).send('App is live');
+});
 
 module.exports = { app };
