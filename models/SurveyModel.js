@@ -37,9 +37,13 @@ const surveySchema = new mongoose.Schema({
       }
     ]],
   }],
+  userAssigned: [
+    {
+      type: String,
+    }
+  ],
   totalRes: {
     type: Number,
-    
   },
   totalReward: {
     type: Number,

@@ -2,17 +2,34 @@ const mongoose = require('mongoose');
 const path = require('path'); // Import the path module
 
 const Survey = require(path.join(__dirname, '..', 'models', 'SurveyModel'));
+const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
 
 // Create a new surveyddd
 exports.createSurvey= async (req, res) => {
   try {
-    const survey = await Survey.create(req.body);
-    res.status(201).json(survey);
+   const survey = await Survey.create(req.body);
+   console.log(survey);
+   let DframeUsers = await DframeUser.find();
+   let matcheDframeUserIds = [];
+      DframeUsers.forEach((duser) => {
+        duser.userSurvey.push(
+          { surveyId: "652e803bfdda92214da43a91", rewards: 1 }
+        );
+      duser.save();
+      matcheDframeUserIds.push(duser._id);
+      console.log("user added",duser._id)
+    });
+    survey.userAssigned=matcheDframeUserIds;
+    survey.save();
+    res.status(201).json({
+      message: 'Post created successfully',
+      id: matcheDframeUserIds,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
-// Get all surveys created by a particular client
+// Get all surveys created by a particular client 
 /*exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;
   try {
@@ -47,7 +64,7 @@ exports.getSurveys = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+ 
 exports.getSurveyAnalysis = async (req, res) => {
   try {
     const survey = await Survey.findById(req.params.surveyId);
