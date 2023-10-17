@@ -1,25 +1,30 @@
+/** @format */
+
 const mongoose = require('mongoose');
 const path = require('path'); // Import the path module
 
 const Survey = require(path.join(__dirname, '..', 'models', 'SurveyModel'));
-const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
+const DframeUser = require(path.join(
+  __dirname,
+  '..',
+  'models',
+  'DframeUserModel'
+));
 
 // Create a new surveyddd
-exports.createSurvey= async (req, res) => {
+exports.createSurvey = async (req, res) => {
   try {
-   const survey = await Survey.create(req.body);
-   console.log(survey);
-   let DframeUsers = await DframeUser.find();
-   let matcheDframeUserIds = [];
-      DframeUsers.forEach((duser) => {
-        duser.userSurvey.push(
-          { surveyId: "652e803bfdda92214da43a91", rewards: 1 }
-        );
+    const survey = await Survey.create(req.body);
+    console.log(survey);
+    let DframeUsers = await DframeUser.find();
+    let matcheDframeUserIds = [];
+    DframeUsers.forEach((duser) => {
+      duser.userSurvey.push({ surveyId: survey._id, rewards: 1 });
       duser.save();
       matcheDframeUserIds.push(duser._id);
-      console.log("user added",duser._id)
+      console.log('user added', duser._id);
     });
-    survey.userAssigned=matcheDframeUserIds;
+    survey.userAssigned = matcheDframeUserIds;
     survey.save();
     res.status(201).json({
       message: 'Post created successfully',
@@ -29,7 +34,7 @@ exports.createSurvey= async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-// Get all surveys created by a particular client 
+// Get all surveys created by a particular client
 /*exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;
   try {
@@ -44,17 +49,17 @@ exports.getSurveysByclient = async (req, res) => {
   const currentDate = new Date();
 
   try {
-    const surveys = await Survey.find({ 
+    const surveys = await Survey.find({
       clientId: clientId,
-      endDate: { $gte: currentDate }
+      endDate: { $gte: currentDate },
     });
 
     res.json(surveys);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}  
-   
+};
+
 // Get all surveys
 exports.getSurveys = async (req, res) => {
   try {
@@ -64,7 +69,7 @@ exports.getSurveys = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
- 
+
 exports.getSurveyAnalysis = async (req, res) => {
   try {
     const survey = await Survey.findById(req.params.surveyId);
@@ -75,24 +80,31 @@ exports.getSurveyAnalysis = async (req, res) => {
     const analysis = survey.totalQues.map((question) => {
       const options = question.options;
       const optionCounts = options.map((option) => {
-        const optionGroup = question.optionGroups.find((group) => group.option === option);
+        const optionGroup = question.optionGroups.find(
+          (group) => group.option === option
+        );
         const count = optionGroup ? optionGroup.userAnswers.length : 0;
         const totalAnswers = question.optionGroups.reduce((total, group) => {
           return total + group.userAnswers.length;
         }, 0);
-        const percentage = totalAnswers > 0 ? ((count / totalAnswers) * 100).toFixed(2) : 0;
+        const percentage =
+          totalAnswers > 0 ? ((count / totalAnswers) * 100).toFixed(2) : 0;
         return {
           option: option,
           count: count,
-          percentage: percentage
+          percentage: percentage,
         };
       });
       optionCounts.sort((a, b) => b.count - a.count);
       const maxCount = optionCounts[0].count;
-      const mostChosenAnswers = optionCounts.filter((optionCount) => optionCount.count === maxCount);
+      const mostChosenAnswers = optionCounts.filter(
+        (optionCount) => optionCount.count === maxCount
+      );
       return {
         question: question.title,
-        mostChosenAnswers: mostChosenAnswers.map((optionCount) => optionCount.option),
+        mostChosenAnswers: mostChosenAnswers.map(
+          (optionCount) => optionCount.option
+        ),
         userCount: maxCount,
         allAnswers: optionCounts,
       };
@@ -123,10 +135,11 @@ exports.getExpiredSurveysByclientid = async (req, res) => {
       endDate: { $lt: new Date() },
     });
     if (expiredSurveysc.length === 0) {
-      return res.status(404).json({ message: 'No expired surveys found for this client.' });
+      return res
+        .status(404)
+        .json({ message: 'No expired surveys found for this client.' });
     }
     res.json(expiredSurveysc);
-   
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -140,7 +153,7 @@ exports.getExpiredSurveyById = async (req, res) => {
       endDate: { $lt: new Date() },
     });
     if (!expiredSurvey) {
-      return res.status(404).json({ message: "Expired survey not found" });
+      return res.status(404).json({ message: 'Expired survey not found' });
     }
     res.json(expiredSurvey);
   } catch (err) {
@@ -151,28 +164,28 @@ exports.getExpiredSurveyById = async (req, res) => {
 // Update a survey
 exports.update = (req, res) => {
   Survey.findByIdAndUpdate(req.params.surveyId, req.body, { new: true })
-    .then(survey => {
+    .then((survey) => {
       if (!survey) {
         return res.status(404).send({
-          message: "Survey not found with id " + req.params.surveyId
+          message: 'Survey not found with id ' + req.params.surveyId,
         });
       }
       res.send(survey);
     })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
         return res.status(404).send({
-          message: "Survey not found with id " + req.params.surveyId
+          message: 'Survey not found with id ' + req.params.surveyId,
         });
       }
       return res.status(500).send({
-        message: "Error updating survey with id " + req.params.surveyId
+        message: 'Error updating survey with id ' + req.params.surveyId,
       });
     });
 };
 
 //verify status
-exports.verifyStatus=async(req, res)=> {
+exports.verifyStatus = async (req, res) => {
   try {
     // Find the ad by its ID
     const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
@@ -184,7 +197,7 @@ exports.verifyStatus=async(req, res)=> {
 
     // Update the status to "verified"
     survey.statusCampaign = 'verified';
-    
+
     // Save the updated ad
     await survey.save();
 
@@ -193,10 +206,10 @@ exports.verifyStatus=async(req, res)=> {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 //pause status
-exports.stopStatus=async(req, res)=> {
+exports.stopStatus = async (req, res) => {
   try {
     // Find the ad by its ID
     const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
@@ -208,7 +221,7 @@ exports.stopStatus=async(req, res)=> {
 
     // Update the status to "verified"
     survey.statusCampaign = 'stop';
-    
+
     // Save the updated ad
     await survey.save();
 
@@ -217,10 +230,10 @@ exports.stopStatus=async(req, res)=> {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 //expired status
-exports.expireStatus=async(req, res)=> {
+exports.expireStatus = async (req, res) => {
   try {
     // Find the ad by its ID
     const surveyId = req.params.id; // Assuming you pass the ad ID as a route parameter
@@ -232,7 +245,7 @@ exports.expireStatus=async(req, res)=> {
 
     // Update the status to "verified"
     survey.statusCampaign = 'expired';
-    
+
     // Save the updated ad
     await survey.save();
 
@@ -241,27 +254,27 @@ exports.expireStatus=async(req, res)=> {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 // Delete a survey with the specified surveyId in the request
 exports.delete = (req, res) => {
   Survey.findByIdAndRemove(req.params.surveyId)
-    .then(survey => {
+    .then((survey) => {
       if (!survey) {
         return res.status(404).send({
-          message: "Survey not found with id " + req.params.surveyId
+          message: 'Survey not found with id ' + req.params.surveyId,
         });
       }
-      res.send({ message: "Survey deleted successfully!" });
+      res.send({ message: 'Survey deleted successfully!' });
     })
-    .catch(err => {
-      if (err.kind === "ObjectId" || err.name === "NotFound") {
+    .catch((err) => {
+      if (err.kind === 'ObjectId' || err.name === 'NotFound') {
         return res.status(404).send({
-          message: "Survey not found with id " + req.params.surveyId
+          message: 'Survey not found with id ' + req.params.surveyId,
         });
       }
       return res.status(500).send({
-        message: "Could not delete survey with id " + req.params.surveyId
+        message: 'Could not delete survey with id ' + req.params.surveyId,
       });
     });
 };
@@ -272,13 +285,12 @@ exports.deleteSurvey = async (req, res) => {
 
   try {
     const survey = await Survey.findOneAndDelete({
-      
-      clientId: clientId
+      clientId: clientId,
     });
     if (!survey) {
-      return res.status(404).json({ message: "Survey not found" });
+      return res.status(404).json({ message: 'Survey not found' });
     }
-    res.json({ message: "Survey deleted successfully!" });
+    res.json({ message: 'Survey deleted successfully!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -288,7 +300,7 @@ exports.deleteSurvey = async (req, res) => {
 exports.deleteAllSurveys = async (req, res) => {
   try {
     await Survey.deleteMany();
-    res.json({ message: "All surveys deleted successfully!" });
+    res.json({ message: 'All surveys deleted successfully!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -303,13 +315,13 @@ exports.deleteExpiredSurveys = async (req, res) => {
       endDate: { $lt: new Date() },
     });
     if (expiredSurveys.length === 0) {
-      return res.status(404).json({ message: "No expired surveys found" });
+      return res.status(404).json({ message: 'No expired surveys found' });
     }
     await Survey.deleteMany({
       clientId: clientId,
       endDate: { $lt: new Date() },
     });
-    res.json({ message: "Expired surveys deleted successfully!" });
+    res.json({ message: 'Expired surveys deleted successfully!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -321,10 +333,10 @@ exports.findOne = (req, res) => {
   const clientId = req.body.clientId;
 
   Survey.findById(surveyId)
-    .then(survey => {
+    .then((survey) => {
       if (!survey) {
         return res.status(404).send({
-          message: "Survey not found with id " + surveyId
+          message: 'Survey not found with id ' + surveyId,
         });
       }
 
@@ -337,14 +349,14 @@ exports.findOne = (req, res) => {
 
       res.send(survey);
     })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
         return res.status(404).send({
-          message: "Survey not found with id " + surveyId
+          message: 'Survey not found with id ' + surveyId,
         });
       }
       return res.status(500).send({
-        message: "Error retrieving survey with id " + surveyId
+        message: 'Error retrieving survey with id ' + surveyId,
       });
     });
 };
@@ -361,7 +373,9 @@ exports.updateStatusSurvey = async (req, res) => {
     survey.statusCampaign = req.body.isActive ? 'active' : 'inactive';
     await survey.save();
 
-    return res.status(200).json({ message: 'Survey status updated successfully' });
+    return res
+      .status(200)
+      .json({ message: 'Survey status updated successfully' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal Server Error' });
