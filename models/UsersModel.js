@@ -15,6 +15,12 @@ const userSchema = mongoose.Schema({
   jwtSession: String,
   jwtExpire: Date,
   tags: [],
+  transactions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Transaction', // Reference to the Transaction model
+    },
+  ],
 });
 
 module.exports = mongoose.model('User', userSchema);

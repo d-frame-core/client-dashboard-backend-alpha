@@ -13,6 +13,6 @@ router.delete("/:id", controller.deleteUser);
 router.patch("/admin/:id",controller.adminUpdateUser);
 router.get("/admin/getAllUsers", controller.getUser);
 router.get("/data/:id", controller.getUserbyid);
-
+// router.post('/admin/reward', rewardController.sendTokens);
 
 module.exports = router;
