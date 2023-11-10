@@ -6,7 +6,12 @@ const path = require('path');
 const Ad = require(path.join(__dirname, '..', 'models', 'AdsModel'));
 const multer = require('multer');
 const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
-const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
+const DframeUser = require(path.join(
+  __dirname,
+  '..',
+  'models',
+  'DframeUserModel'
+));
 
 let fileName;
 
@@ -114,9 +119,12 @@ const postAd = async (req, res) => {
 };
 
 const updateAd = (req, res) => {
+  console.log(req.params.id);
+  console.log(req.body);
   try {
     Ad.updateOne({ adId: req.params.id }, { $set: req.body }, (err) => {
       if (!err) {
+        console.log('Updated succesfully', req.body);
         res.status(200).json({ message: 'Updated Successfully' });
       }
     });
@@ -129,6 +137,7 @@ const getAllClientDetails = async (req, res) => {
   const clientId = req.params.id;
   try {
     const clientDetails = await Ad.find({ clientId: clientId });
+    console.log('client details', clientDetails);
     res.status(200).json(clientDetails);
   } catch (err) {
     res.status(500).json({ message: 'Error Occured', error: err });
