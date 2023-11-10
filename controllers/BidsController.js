@@ -1,9 +1,10 @@
+/** @format */
+
 const path = require('path'); // Import the path module
 
 const Bid = require(path.join(__dirname, '..', 'models', 'BidsModel'));
 const Ad = require(path.join(__dirname, '..', 'models', 'AdsModel'));
 const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
-
 
 function gettingUsers(users, noOfBids, bidRank) {
   let no_of_users = users;
@@ -36,7 +37,7 @@ function gettingUsers(users, noOfBids, bidRank) {
   }
 
   let assignedUserToBid = divideIntoRatios(x, ratios)[bidRank - 1];
-  console.log("assigned users to the bid", assignedUserToBid);
+  console.log('assigned users to the bid', assignedUserToBid);
 
   return assignedUserToBid;
 }
@@ -49,7 +50,7 @@ const getBids = async (req, res) => {
     if (getBids) {
       res.status(200).json(getBids);
     } else {
-      res.status(200).json("No bids found");
+      res.status(200).json('No bids found');
     }
   } catch (err) {
     res.status(500).json(err);
@@ -62,26 +63,93 @@ const getBid = async (req, res) => {
     if (foundBid.length) {
       res.status(200).json(foundBid);
     } else {
-      res.status(200).json({ message: "No bid found" });
+      res.status(200).json({ message: 'No bid found' });
     }
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
+// const updateBid = async (req, res) => {
+//   const clientId = req.params.id;
+//   const bidAmount = req.body.bidAmount;
+
+//   try {
+//     await Bid.deleteOne({ clientId: clientId }, (err) => {
+//       // if (!err) {
+//       //   res.status(200).json({ message: "Deleted Successfully" });
+//       // }
+//     });
+//   } catch (err) {
+//     // res.status(500).json({ message: "Error Occured", error: err });
+//     console.log(err);
+//   }
+
+//   const newBid = new Bid({
+//     clientId,
+//     campaignBudget: {
+//       perDay: req.body.perDay,
+//       totalDays: req.body.totalDays,
+//     },
+//     bidAmount,
+//   });
+
+//   try {
+//     const savedBid = await newBid.save();
+//     console.log(savedBid);
+
+//     const result = await Bid.aggregate([
+//       { $sort: { bidAmount: -1 } },
+//       {
+//         $group: {
+//           _id: null,
+//           clientIds: { $push: "$bidAmount" },
+//         },
+//       },
+//     ]);
+//     console.log(result[0].clientIds);
+
+//     let rank = result[0].clientIds.indexOf(bidAmount) + 1;
+//     console.log("rank: ", rank);
+
+//     const users = await User.countDocuments();
+//     console.log("no of users in log", users);
+
+//     const bids = await Bid.countDocuments();
+//     console.log("no of bids in log", bids);
+
+//     console.log(users);
+//     console.log(bids);
+//     console.log(rank);
+//     let assignedUsers = gettingUsers(users, bids, rank)
+//     console.log(assignedUsers);
+
+//     Ad.updateOne(
+//       { _id: clientId },
+//       {
+//         $set: {
+//           users: { $slice: assignedUsers },
+//           assignedUsers: assignedUsers,
+//         },
+//       }
+//     );
+
+//     res.status(201).json({ message: "post updated", savedBid });
+//   } catch (err) {
+//     res.status(500).json({ message: "Error Occured", error: err });
+//   }
+// };
+
 const updateBid = async (req, res) => {
   const clientId = req.params.id;
   const bidAmount = req.body.bidAmount;
 
   try {
-    await Bid.deleteOne({ clientId: clientId }, (err) => {
-      // if (!err) {
-      //   res.status(200).json({ message: "Deleted Successfully" });
-      // }
-    });
+    await Bid.deleteOne({ clientId: clientId }); // Removed the callback
   } catch (err) {
-    // res.status(500).json({ message: "Error Occured", error: err });
     console.log(err);
+    res.status(500).json({ message: 'Error Occurred', error: err });
+    return;
   }
 
   const newBid = new Bid({
@@ -89,7 +157,7 @@ const updateBid = async (req, res) => {
     campaignBudget: {
       perDay: req.body.perDay,
       totalDays: req.body.totalDays,
-    },  
+    },
     bidAmount,
   });
 
@@ -102,40 +170,50 @@ const updateBid = async (req, res) => {
       {
         $group: {
           _id: null,
-          clientIds: { $push: "$bidAmount" },
+          clientIds: { $push: '$bidAmount' },
         },
       },
     ]);
     console.log(result[0].clientIds);
 
     let rank = result[0].clientIds.indexOf(bidAmount) + 1;
-    console.log("rank: ", rank);
+    console.log('rank: ', rank);
 
     const users = await User.countDocuments();
-    console.log("no of users in log", users);
+    console.log('no of users in log', users);
 
     const bids = await Bid.countDocuments();
-    console.log("no of bids in log", bids);
+    console.log('no of bids in log', bids);
 
     console.log(users);
     console.log(bids);
     console.log(rank);
-    let assignedUsers = gettingUsers(users, bids, rank)
+    let assignedUsers = gettingUsers(users, bids, rank);
     console.log(assignedUsers);
 
-    Ad.updateOne(
-      { _id: clientId },
-      {
-        $set: {
-          users: { $slice: assignedUsers },
-          assignedUsers: assignedUsers,
-        },
-      }
-    );
+    // Fetch the ad using adId from req.body.adId
+    const adId = req.body.adId;
+    const adToUpdate = await Ad.findById(adId);
 
-    res.status(201).json({ message: "post updated", savedBid });
+    if (!adToUpdate) {
+      res.status(404).json({ message: 'Ad not found' });
+      return;
+    }
+
+    // Update the fields in the fetched ad
+    adToUpdate.bidAmount = bidAmount;
+    adToUpdate.perDay = req.body.perDay;
+    adToUpdate.totalDays = req.body.totalDays;
+    adToUpdate.assignedUsers = assignedUsers;
+    adToUpdate.users = assignedUsers;
+
+    // Save the updated ad
+    const updatedAd = await adToUpdate.save();
+    console.log('updated ad ', updatedAd);
+    res.status(201).json({ message: 'Post updated', savedBid, updatedAd });
   } catch (err) {
-    res.status(500).json({ message: "Error Occured", error: err });
+    console.log(err);
+    res.status(500).json({ message: 'Error Occurred', error: err });
   }
 };
 
@@ -143,11 +221,11 @@ const deleteBid = async (req, res) => {
   try {
     Bid.deleteOne({ clientId: req.params.id }, (err) => {
       if (!err) {
-        res.status(200).json({ message: "Deleted Successfully" });
+        res.status(200).json({ message: 'Deleted Successfully' });
       }
     });
   } catch (err) {
-    res.status(500).json({ message: "Error Occured", error: err });
+    res.status(500).json({ message: 'Error Occured', error: err });
   }
 };
 
@@ -172,25 +250,25 @@ const postBid = async (req, res) => {
       {
         $group: {
           _id: null,
-          clientIds: { $push: "$bidAmount" },
+          clientIds: { $push: '$bidAmount' },
         },
       },
     ]);
     console.log(result[0].clientIds);
 
     let rank = result[0].clientIds.indexOf(bidAmount) + 1;
-    console.log("rank: ", rank);
+    console.log('rank: ', rank);
 
     const users = await User.countDocuments();
-    console.log("no of users in log", users);
+    console.log('no of users in log', users);
 
     const bids = await Bid.countDocuments();
-    console.log("no of bids in log", bids);
+    console.log('no of bids in log', bids);
 
     console.log(users);
     console.log(bids);
     console.log(rank);
-    let assignedUsers = gettingUsers(users, bids, rank)
+    let assignedUsers = gettingUsers(users, bids, rank);
     console.log(assignedUsers);
 
     Ad.updateOne(
@@ -203,10 +281,10 @@ const postBid = async (req, res) => {
       }
     );
 
-    res.status(201).json({ message: "post created", savedBid });
+    res.status(201).json({ message: 'post created', savedBid });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "some error occured", err: err });
+    res.status(400).json({ message: 'some error occured', err: err });
   }
 };
 

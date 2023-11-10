@@ -118,18 +118,44 @@ const postAd = async (req, res) => {
   }
 };
 
-const updateAd = (req, res) => {
-  console.log(req.params.id);
-  console.log(req.body);
+// const updateAd = async (req, res) => {
+//   try {
+//     const result = await Ad.updateOne(
+//       { adId: req.params.id },
+//       { $set: req.body }
+//     );
+
+//     if (result.nModified > 0) {
+//       console.log('Updated successfully', req.body);
+//       res.status(200).json({ message: 'Updated Successfully' });
+//     } else {
+//       console.log('No changes were made to the ad');
+//       res.status(200).json({ message: 'No changes made to the ad' });
+//     }
+//   } catch (err) {
+//     res.status(500).json({ message: 'Error Occured', error: err });
+//   }
+// };
+const updateAd = async (req, res) => {
   try {
-    Ad.updateOne({ adId: req.params.id }, { $set: req.body }, (err) => {
-      if (!err) {
-        console.log('Updated succesfully', req.body);
-        res.status(200).json({ message: 'Updated Successfully' });
-      }
-    });
+    // Fetch existing ad
+    const ad = await Ad.findById(req.params.id);
+
+    // Update adName and adContent
+    if (req.body.adName) {
+      ad.adName = req.body.adName;
+    }
+    if (req.body.adContent) {
+      ad.adContent = req.body.adContent;
+    }
+
+    // Save updated ad
+    const updatedAd = await ad.save();
+
+    res.json(updatedAd);
   } catch (err) {
-    res.status(500).json({ message: 'Error Occured', error: err });
+    console.error(err);
+    res.status(500).send('Error updating ad');
   }
 };
 
@@ -137,7 +163,7 @@ const getAllClientDetails = async (req, res) => {
   const clientId = req.params.id;
   try {
     const clientDetails = await Ad.find({ clientId: clientId });
-    console.log('client details', clientDetails);
+    // console.log('client details', clientDetails);
     res.status(200).json(clientDetails);
   } catch (err) {
     res.status(500).json({ message: 'Error Occured', error: err });
@@ -283,7 +309,7 @@ const testCreateAd = async (req, res) => {
 
       blobStream.on('finish', async () => {
         // Set the image field to the GCS image URL
-        newAd.image = `https://storage.cloud.google.com/${bucketName}/${filename}?authuser=2`;
+        newAd.image = `https://storage.googleapis.com/${bucketName}/${filename}`;
         console.log('this is new ad ', newAd);
         // Save the ad to the database
         savedAd = await newAd.save();
