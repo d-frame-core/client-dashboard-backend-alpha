@@ -12,20 +12,65 @@ const DframeUser = require(path.join(
 ));
 
 // Create a new surveyddd
+// exports.createSurvey = async (req, res) => {
+//   try {
+//     const survey = await Survey.create(req.body);
+//     console.log(survey);
+//     let DframeUsers = await DframeUser.find();
+//     let matcheDframeUserIds = [];
+//     DframeUsers.forEach((duser) => {
+//       duser.userSurvey.push({ surveyId: survey._id, rewards: 1 });
+//       duser.save();
+//       matcheDframeUserIds.push(duser._id);
+//       console.log('user added', duser._id);
+//     });
+//     survey.userAssigned = matcheDframeUserIds;
+//     survey.save();
+//     res.status(201).json({
+//       message: 'Post created successfully',
+//       id: matcheDframeUserIds,
+//     });
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
 exports.createSurvey = async (req, res) => {
+  console.log('Entered Create Survey');
   try {
     const survey = await Survey.create(req.body);
     console.log(survey);
     let DframeUsers = await DframeUser.find();
     let matcheDframeUserIds = [];
-    DframeUsers.forEach((duser) => {
-      duser.userSurvey.push({ surveyId: survey._id, rewards: 1 });
-      duser.save();
+    const currentDate = new Date().toLocaleDateString('en-GB');
+
+    DframeUsers.forEach(async (duser) => {
+      const existingSurveyEntry = duser.userSurvey.find(
+        (entry) => entry.date === currentDate
+      );
+
+      if (existingSurveyEntry) {
+        // Survey entry for the current date exists, push survey details to that entry
+        existingSurveyEntry.surveys.push({
+          surveyId: survey._id,
+          rewards: 1,
+          status: 'UNSEEN',
+        });
+      } else {
+        // Create a new entry with the current date
+        duser.userSurvey.push({
+          date: currentDate,
+          surveys: [{ surveyId: survey._id, rewards: 1, status: 'UNSEEN' }],
+        });
+      }
+
+      await duser.save();
       matcheDframeUserIds.push(duser._id);
       console.log('user added', duser._id);
     });
+
     survey.userAssigned = matcheDframeUserIds;
-    survey.save();
+    await survey.save();
+
     res.status(201).json({
       message: 'Post created successfully',
       id: matcheDframeUserIds,
@@ -34,6 +79,7 @@ exports.createSurvey = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 // Get all surveys created by a particular client
 /*exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;

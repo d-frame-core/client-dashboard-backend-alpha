@@ -274,6 +274,7 @@ const testCreateAd = async (req, res) => {
     } = req.body;
 
     // Create a new ad instance
+    console.log(clientId);
     const newAd = new Ad({
       clientId,
       campaignName,
@@ -292,6 +293,7 @@ const testCreateAd = async (req, res) => {
     });
     let savedAd;
     // Upload the image to GCS
+    console.log('ENTERED THIS FUNCTION');
     if (req.file) {
       const originalFilename = req.file.originalname;
       const bucket = storageClient.bucket(bucketName);
@@ -325,7 +327,7 @@ const testCreateAd = async (req, res) => {
           //   })
           DframeUsers.forEach((duser) => {
             const userAdIndex = duser.userAds.findIndex(
-              (entry) => entry.date === '2023-10-11'
+              (entry) => entry.date === new Date().toLocaleDateString('en-GB')
             );
             if (userAdIndex !== -1) {
               // User has an entry for today's date, push the new
@@ -336,7 +338,7 @@ const testCreateAd = async (req, res) => {
             } else {
               // User doesn't have an entry for today's date, create a new entry
               duser.userAds.push({
-                date: '2023-10-11',
+                date: new Date().toLocaleDateString('en-GB'),
                 ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }],
               });
             }

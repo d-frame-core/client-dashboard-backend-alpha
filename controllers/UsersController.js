@@ -88,6 +88,7 @@ const postProfileImage = async (req, res) => {
       return res.status(404).json({ message: 'NO FILE RECEIVED' });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: 'INTERNAL Error occurred' });
   }
 };
