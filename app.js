@@ -16,6 +16,7 @@ const ProfileRoute = require(path.join(__dirname, "routes", "ImageRoute"));
 const BidsRoute = require(path.join(__dirname, "routes", "BidsRoute"));
 const AdminRoute = require(path.join(__dirname, "routes", "AdminRoute"));
 const DframeUser = require(path.join(__dirname, "routes", "DframeUser"));
+const Tags = require(path.join(__dirname, "routes", "TagRoute"));
 
 const cookieParser = require("cookie-parser");
 
@@ -64,6 +65,7 @@ app.use('/Help', HelpRoute);//admin done
 app.use('/F&Q', FaqRoute);//admin done
 app.use("/bids", BidsRoute)
 app.use("/admin", AdminRoute)
+app.use("/tag", Tags)
 app.use('/uploads', express.static('uploads'), ProfileRoute);
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
