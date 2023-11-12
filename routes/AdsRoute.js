@@ -5,7 +5,12 @@ const path = require('path'); // Import the path module
 const router = express.Router();
 
 // Convert relative paths to absolute paths
-const controller = require(path.join(__dirname, '..', 'controllers', 'AdsController'));
+const controller = require(path.join(
+  __dirname,
+  '..',
+  'controllers',
+  'AdsController'
+));
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });

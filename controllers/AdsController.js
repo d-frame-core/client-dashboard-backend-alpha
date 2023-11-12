@@ -293,7 +293,7 @@ const testCreateAd = async (req, res) => {
     });
     let savedAd;
     // Upload the image to GCS
-    console.log('ENTERED THIS FUNCTION');
+
     if (req.file) {
       const originalFilename = req.file.originalname;
       const bucket = storageClient.bucket(bucketName);
@@ -361,7 +361,40 @@ const testCreateAd = async (req, res) => {
       blobStream.end(req.file.buffer);
     } else {
       // Save the ad without an image
+      console.log('ENTERED THIS FUNCTION');
+
       savedAd = await newAd.save();
+      let totalUser = newAd.perDay / newAd.bidAmount;
+      let DframeUsers = await DframeUser.find();
+      let matcheDframeUserIds = [];
+      let i = 0;
+      DframeUsers.forEach((duser) => {
+        const userAdIndex = duser.userAds.findIndex(
+          (entry) => entry.date === new Date().toLocaleDateString('en-GB')
+        );
+        if (userAdIndex !== -1) {
+          // User has an entry for today's date, push the new
+          duser.userAds[userAdIndex].ads.push({
+            adsId: savedAd._id,
+            rewards: newAd.bidAmount,
+          });
+        } else {
+          // User doesn't have an entry for today's date, create a new entry
+          duser.userAds.push({
+            date: new Date().toLocaleDateString('en-GB'),
+            ads: [{ adsId: savedAd._id, rewards: newAd.bidAmount }],
+          });
+        }
+        // Save the updated user data
+        duser.save();
+        matcheDframeUserIds.push(duser._id);
+        totalUser--;
+      });
+      i++;
+      res.status(201).json({
+        message: 'Post created WITHOUT media',
+        id: matcheDframeUserIds,
+      });
     }
   } catch (error) {
     console.log('ERROR in CATCH', error);

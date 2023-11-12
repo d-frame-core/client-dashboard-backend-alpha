@@ -35,10 +35,9 @@ const DframeUser = require(path.join(
 //   }
 // };
 exports.createSurvey = async (req, res) => {
-  console.log('Entered Create Survey');
   try {
     const survey = await Survey.create(req.body);
-    console.log(survey);
+    console.log('we are receiving the data', req.body);
     let DframeUsers = await DframeUser.find();
     let matcheDframeUserIds = [];
     const currentDate = new Date().toLocaleDateString('en-GB');
