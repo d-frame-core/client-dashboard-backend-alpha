@@ -91,7 +91,7 @@ exports.createSurvey = async (req, res) => {
 };*/
 exports.getSurveysByclient = async (req, res) => {
   const clientId = req.headers.clientid;
-  const currentDate = new Date();
+  const currentDate = new Date().toLocaleDateString('en-GB');
 
   try {
     const surveys = await Survey.find({
