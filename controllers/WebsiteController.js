@@ -1,7 +1,19 @@
 const cron = require('node-cron');
 const { WebsiteData } = require('../models/websites.model'); // Import your Mongoose model
-
+const {Tag} = require('../models/Tags');
 // Define a function to update the status
+const getAllWebsites = async (req, res) => {
+  try {
+    const websites = await WebsiteData.find();
+    return res.json(websites);
+  } catch (error) {
+    console.error('Error getting all websites:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
 const updateStatus = async () => {
   try {
     // Find records with visitorCounts greater than or equal to 500
@@ -105,8 +117,7 @@ const changeStatusToTagged = async (req, res) => {
       return res.status(500).json({ message: 'Internal server error' });
     }
   };
-
-  
+ 
   const removeTagsFromWebsite = async (req, res) => {
     const { websiteId, tagsToRemove } = req.body;
   
@@ -144,6 +155,35 @@ const changeStatusToTagged = async (req, res) => {
     }
   };
 
+const dataPool = async (req, res) => {
+  try {
+    const tags = await Tag.find().populate({
+      path: 'websites',
+      model: 'WebsiteData',
+      select: 'website visitorCounts',
+    });
+
+    const result = tags.map((tag) => {
+      const websites = tag.websites.map((website) => ({
+        website: website.website,
+        visitorCounts: website.visitorCounts,
+      }));
+
+      return {
+        tag: tag.name,
+        status: tag.status,
+        websites,
+        totalVisitors: websites.reduce((total, site) => total + site.visitorCounts, 0),
+      };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 // Define a cron job to run every day at a specific time (e.g., midnight)
 cron.schedule('0 0 * * *', () => {
   // Run the updateStatus function
@@ -151,4 +191,4 @@ cron.schedule('0 0 * * *', () => {
 });
 
   // Export the controller function
-  module.exports = { addTagsToWebsite, updateStatusToStopped, removeTagsFromWebsite, changeStatusToTagged };
+  module.exports = { dataPool, getAllWebsites, addTagsToWebsite, updateStatusToStopped, removeTagsFromWebsite, changeStatusToTagged };

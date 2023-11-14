@@ -46,6 +46,7 @@ const getAllTags = async (req, res) => {
 
 const getActiveTags = async (req, res) => {
   try {
+    
     const activeTags = await Tag.find({ status: 'active' });
 
     res.status(200).json(activeTags);

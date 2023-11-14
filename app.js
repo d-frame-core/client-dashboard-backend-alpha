@@ -13,6 +13,7 @@ const HelpRoute = require(path.join(__dirname, 'routes', 'HelpRoute'));
 const UsersRoute = require(path.join(__dirname, 'routes', 'UsersRoute'));
 const SurveyRoute = require(path.join(__dirname, 'routes', 'SurveyRoute'));
 const AuthRoute = require(path.join(__dirname, 'routes', 'AuthRoute'));
+const WebsiteRoute = require(path.join(__dirname, 'routes', 'Website'));
 const LearnMoreRoute = require(path.join(
   __dirname,
   'routes',
@@ -71,8 +72,10 @@ app.use('/Help', HelpRoute); //admin done
 app.use('/F&Q', FaqRoute); //admin done
 app.use('/bids', BidsRoute);
 app.use('/admin', AdminRoute);
+app.use('/tags', Tags);
 app.use('/uploads', express.static('uploads'), ProfileRoute);
 app.use('/wallet', WalletRouter);
+app.use('/websites', WebsiteRoute);
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
 });
