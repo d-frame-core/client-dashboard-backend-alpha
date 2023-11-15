@@ -1,4 +1,4 @@
-const cron = require('node-cron');
+// const cron = require('node-cron');
 const { WebsiteData } = require('../models/websites.model'); // Import your Mongoose model
 const {Tag} = require('../models/Tags');
 // Define a function to update the status
@@ -185,10 +185,10 @@ const dataPool = async (req, res) => {
 };
 
 // Define a cron job to run every day at a specific time (e.g., midnight)
-cron.schedule('0 0 * * *', () => {
-  // Run the updateStatus function
-  updateStatus();
-});
+// cron.schedule('0 0 * * *', () => {
+//   // Run the updateStatus function
+//   updateStatus();
+// });
 
   // Export the controller function
   module.exports = { dataPool, getAllWebsites, addTagsToWebsite, updateStatusToStopped, removeTagsFromWebsite, changeStatusToTagged };
