@@ -38,6 +38,7 @@ const Tags = require(path.join(__dirname, 'src', 'routes', 'TagRoute'));
 
 const cookieParser = require('cookie-parser');
 const { WalletRouter } = require('./src/routes/wallet.route');
+const { Cron } = require('./src/routes/cron');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -87,6 +88,7 @@ app.use('/tags', Tags);
 app.use('/uploads', express.static('uploads'), ProfileRoute);
 app.use('/wallet', WalletRouter);
 app.use('/websites', WebsiteRoute);
+app.use('/cron', Cron);
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
 });
