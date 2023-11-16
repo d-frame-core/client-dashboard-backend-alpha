@@ -143,7 +143,7 @@ const updateAdsAndSurveysForAllUsers = async () => {
       // Update ads for the user
       const currentDate = new Date().toLocaleDateString('en-GB');
       const previousDate = new Date();
-      previousDate.setDate(previousDate.getDate() - 1); // Get previous date
+      previousDate.setDate(previousDate.getDate() - 1);
       const formattedPreviousDate = previousDate.toLocaleDateString('en-GB');
 
       // Update ads logic
@@ -217,6 +217,7 @@ router.patch('/update-date', async (req, res) => {
 
 module.exports = router;
 module.exports.Cron = router;
+
 // Schedule the job to run every 7 days (every Monday at 00:00)
 // cron.schedule('0 0 * * 1', async () => {
 //   await updateAdsAndSurveysForAllUsers();
