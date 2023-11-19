@@ -157,15 +157,31 @@ const toggleStatus = async (req, res) => {
   }
 };
 
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
+  console.log('data received', req.body);
   try {
-    User.updateOne({ _id: req.params.id }, { $set: req.body }, (err) => {
-      if (!err) {
-        res.status(200).json({ message: 'Updated Successfully' });
-      }
+    const userId = req.params.id;
+
+    // Fetch the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      console.log('user not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the user fields with the request body
+    console.log('user found');
+    Object.keys(req.body).forEach((key) => {
+      user[key] = req.body[key];
     });
+
+    // Save the updated user
+    await user.save();
+
+    res.status(200).json({ message: 'Updated Successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Error Occures', error: err });
+    res.status(500).json({ message: 'Error Occurred', error: err.message });
   }
 };
 
