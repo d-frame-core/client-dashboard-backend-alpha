@@ -170,15 +170,16 @@ const getAllClientDetails = async (req, res) => {
   }
 };
 
-const deleteAd = (req, res) => {
+const deleteAd = async (req, res) => {
   try {
-    Ad.deleteOne({ adId: req.params.id }, (err) => {
-      if (!err) {
-        res.status(200).json({ message: 'Deleted Successfully' });
-      }
-    });
+    const ad = await Ad.findByIdAndDelete(req.params.id);
+    if (ad) {
+      res.status(200).json({ message: 'Deleted Successfully' });
+    } else {
+      res.status(404).json({ message: 'Ad not found' });
+    }
   } catch (err) {
-    res.status(500).json({ message: 'Error Occured', error: err });
+    res.status(500).json({ message: 'Error Occurred', error: err });
   }
 };
 
@@ -209,7 +210,7 @@ async function verifyStatus(req, res) {
     }
 
     // Update the status to "verified"
-    ad.status = 'verified';
+    ad.status = 'VERIFIED';
 
     // Save the updated ad
     await ad.save();
@@ -231,8 +232,7 @@ async function pausedStatus(req, res) {
       return res.status(404).json({ message: 'Ad not found' });
     }
 
-    // Update the status to "verified"
-    ad.status = 'paused';
+    ad.status = 'STOPPED';
 
     // Save the updated ad
     await ad.save();

@@ -241,7 +241,7 @@ exports.verifyStatus = async (req, res) => {
     }
 
     // Update the status to "verified"
-    survey.statusCampaign = 'verified';
+    survey.statusCampaign = 'VERIFIED';
 
     // Save the updated ad
     await survey.save();
@@ -265,7 +265,7 @@ exports.stopStatus = async (req, res) => {
     }
 
     // Update the status to "verified"
-    survey.statusCampaign = 'stop';
+    survey.statusCampaign = 'STOPPED';
 
     // Save the updated ad
     await survey.save();
@@ -289,7 +289,7 @@ exports.expireStatus = async (req, res) => {
     }
 
     // Update the status to "verified"
-    survey.statusCampaign = 'expired';
+    survey.statusCampaign = 'EXPIRED';
 
     // Save the updated ad
     await survey.save();
