@@ -1,3 +1,5 @@
+/** @format */
+
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
@@ -25,8 +27,8 @@ const transactionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'completed', 'under review', 'cancelled'],
-    default: 'pending',
+    enum: ['PENDING', 'COMPLETED', 'UNDERREVIEW', 'CANCELLED'],
+    default: 'PENDING',
   },
 });
 

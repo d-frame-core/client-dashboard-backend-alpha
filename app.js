@@ -11,6 +11,12 @@ const AdsRoute = require(path.join(__dirname, 'src', 'routes', 'AdsRoute'));
 const FaqRoute = require(path.join(__dirname, 'src', 'routes', 'FaqRoute'));
 const HelpRoute = require(path.join(__dirname, 'src', 'routes', 'HelpRoute'));
 const UsersRoute = require(path.join(__dirname, 'src', 'routes', 'UsersRoute'));
+const TransactionRouter = require(path.join(
+  __dirname,
+  'src',
+  'routes',
+  'TransactionRoute'
+));
 const SurveyRoute = require(path.join(
   __dirname,
   'src',
@@ -89,6 +95,7 @@ app.use('/uploads', express.static('uploads'), ProfileRoute);
 app.use('/wallet', WalletRouter);
 app.use('/websites', WebsiteRoute);
 app.use('/cron', CronJob);
+app.use('/transaction', TransactionRouter);
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
 });

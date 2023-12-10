@@ -3,16 +3,18 @@
 // AD history
 // Analytics
 const path = require('path');
+const nodemailer = require('nodemailer');
 const Ad = require(path.join(__dirname, '..', 'models', 'AdsModel'));
 const multer = require('multer');
 const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+const { Storage } = require('@google-cloud/storage');
+const UsersModel = require('../models/UsersModel');
 const DframeUser = require(path.join(
   __dirname,
   '..',
   'models',
   'DframeUserModel'
 ));
-
 let fileName;
 require('dotenv').config();
 const storage = multer.diskStorage({
@@ -211,11 +213,34 @@ async function verifyStatus(req, res) {
 
     // Update the status to "verified"
     ad.status = 'VERIFIED';
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dframe.org@gmail.com',
+        pass: process.env.pass,
+      },
+    });
+    const user = await User.findById(ad.clientId);
 
-    // Save the updated ad
-    await ad.save();
+    const mailOptions = {
+      from: 'dframe.org@gmail.com',
+      to: user.companyEmail,
+      subject: 'Campaign Verified',
+      text: 'Your campaign has been Verified and will now be visible to the users',
+    };
 
-    return res.status(200).json({ message: 'Status updated to verified' });
+    await transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Email failed' });
+      }
+
+      await ad.save();
+      console.log('campaign verified and email sent');
+      return res
+        .status(200)
+        .json({ message: 'Campaign Verified & email sent' });
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -235,16 +260,37 @@ async function pausedStatus(req, res) {
     ad.status = 'STOPPED';
 
     // Save the updated ad
-    await ad.save();
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dframe.org@gmail.com',
+        pass: process.env.pass,
+      },
+    });
+    const user = await User.findById(ad.clientId);
 
-    return res.status(200).json({ message: 'Status updated to verified' });
+    const mailOptions = {
+      from: 'dframe.org@gmail.com',
+      to: user.companyEmail,
+      subject: 'Campaign stopped',
+      text: 'Your campaign has been stopped',
+    };
+
+    await transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Email failed' });
+      }
+
+      await ad.save();
+      console.log('campaign stopped and email sent');
+      return res.status(200).json({ message: 'Campaign stopped & email sent' });
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 }
-
-const { Storage } = require('@google-cloud/storage');
 
 // Set up Google Cloud Storage
 const storageClient = new Storage({

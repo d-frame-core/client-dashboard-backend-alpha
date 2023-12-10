@@ -2,6 +2,8 @@
 
 const mongoose = require('mongoose');
 const path = require('path'); // Import the path module
+const UsersModel = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+const nodemailer = require('nodemailer');
 
 const Survey = require(path.join(__dirname, '..', 'models', 'SurveyModel'));
 const DframeUser = require(path.join(
@@ -11,6 +13,7 @@ const DframeUser = require(path.join(
   'DframeUserModel'
 ));
 
+require('dotenv').config();
 // Create a new surveyddd
 // exports.createSurvey = async (req, res) => {
 //   try {
@@ -242,11 +245,31 @@ exports.verifyStatus = async (req, res) => {
 
     // Update the status to "verified"
     survey.statusCampaign = 'VERIFIED';
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dframe.org@gmail.com',
+        pass: process.env.pass,
+      },
+    });
+    const user = await UsersModel.findById(survey.clientId);
 
-    // Save the updated ad
-    await survey.save();
+    const mailOptions = {
+      from: 'dframe.org@gmail.com',
+      to: user.companyEmail,
+      subject: 'Survey Verified',
+      text: 'Dear Client Name, Your survey has been created and now visible to the users most suited to it.',
+    };
 
-    return res.status(200).json({ message: 'Status updated to verified' });
+    await transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Email failed' });
+      }
+
+      await survey.save();
+      return res.status(200).json({ message: 'Survey Verified & email sent' });
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -268,9 +291,31 @@ exports.stopStatus = async (req, res) => {
     survey.statusCampaign = 'STOPPED';
 
     // Save the updated ad
-    await survey.save();
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dframe.org@gmail.com',
+        pass: process.env.pass,
+      },
+    });
+    const user = await UsersModel.findById(survey.clientId);
 
-    return res.status(200).json({ message: 'Status updated to verified' });
+    const mailOptions = {
+      from: 'dframe.org@gmail.com',
+      to: user.companyEmail,
+      subject: 'Survey stopped',
+      text: 'Dear Client Name, Your survey has been deleted due to policy violation. Please contact us via email for further discussion before re-posting the same.',
+    };
+
+    await transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Email failed' });
+      }
+
+      await survey.save();
+      return res.status(200).json({ message: 'Survey stopped & email sent' });
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });

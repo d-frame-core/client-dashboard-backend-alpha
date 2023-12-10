@@ -1,5 +1,23 @@
-const Transaction = require('./transactionModel');
+/** @format */
 
+const mongoose = require('mongoose');
+const path = require('path'); // Import the path module
+const UsersModel = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+const nodemailer = require('nodemailer');
+const Transaction = require(path.join(
+  __dirname,
+  '..',
+  'models',
+  'Transaction'
+));
+const DframeUser = require(path.join(
+  __dirname,
+  '..',
+  'models',
+  'DframeUserModel'
+));
+
+require('dotenv').config();
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
   try {
