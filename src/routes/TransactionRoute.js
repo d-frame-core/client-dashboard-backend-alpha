@@ -19,6 +19,14 @@ router.get('/transactions', transactionController.getAllTransactions);
 // Get a single transaction by ID
 router.get('/transactions/:id', transactionController.getTransactionById);
 
+router.put('/update', transactionController.updateStatusToCompleted);
+
+router.get('/pending', transactionController.getPendingTransactions);
+router.get(
+  '/client/:clientId',
+  transactionController.getTransactionsByClientId
+);
+
 // Update the status of a transaction
 router.put(
   '/transactions/:id/status',
