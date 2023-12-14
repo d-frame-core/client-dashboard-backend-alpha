@@ -3,7 +3,7 @@ const router = express.Router();
 const transactionController = require('../controllers/TransactionController');
 
 // Create a new transaction
-router.post('/transactions', transactionController.createTransaction);
+router.post('/transactions', transactionController.createTransaction); 
 
 // Get all transactions
 router.get('/transactions', transactionController.getAllTransactions);
