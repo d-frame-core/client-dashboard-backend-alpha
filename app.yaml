@@ -1,7 +1,11 @@
+# @format
+
 runtime: nodejs18
 
 env_variables:
-
   MONGOSTRING: 'mongodb+srv://dframe_admin:ONWbUyM5ADDBxAE5@cluster0.jcsev3b.mongodb.net/Ad-Campaign'
-
-  JWT_SECRET: 'dframe@s3cr3t!#'
+  CONNECTIONSTRING: 'mongodb+srv://dframe_admin:ONWbUyM5ADDBxAE5@cluster0.jcsev3b.mongodb.net/Ad-Campaign'
+  JWT_SECRET: 'yOmR7WoiH7pkU3EXJiYIiYWzWS0JebfM'
+  ALCHEMY_RPC: 'https://polygon-mainnet.g.alchemy.com/v2/nHyM53VqfExPfPNYL5VLT1urCiUOunq_'
+  PORT: 8080
+  GCP_PROJECTID: 'scenic-sunspot-391708'

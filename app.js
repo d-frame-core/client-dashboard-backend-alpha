@@ -7,26 +7,44 @@ const helmet = require('helmet');
 const path = require('path'); // Import the path module
 
 // Convert relative paths to absolute paths
-const AdsRoute = require(path.join(__dirname, 'routes', 'AdsRoute'));
-const FaqRoute = require(path.join(__dirname, 'routes', 'FaqRoute'));
-const HelpRoute = require(path.join(__dirname, 'routes', 'HelpRoute'));
-const UsersRoute = require(path.join(__dirname, 'routes', 'UsersRoute'));
-const SurveyRoute = require(path.join(__dirname, 'routes', 'SurveyRoute'));
-const AuthRoute = require(path.join(__dirname, 'routes', 'AuthRoute'));
-const WebsiteRoute = require(path.join(__dirname, 'routes', 'Website'));
+const AdsRoute = require(path.join(__dirname, 'src', 'routes', 'AdsRoute'));
+const FaqRoute = require(path.join(__dirname, 'src', 'routes', 'FaqRoute'));
+const HelpRoute = require(path.join(__dirname, 'src', 'routes', 'HelpRoute'));
+const UsersRoute = require(path.join(__dirname, 'src', 'routes', 'UsersRoute'));
+const TransactionRouter = require(path.join(
+  __dirname,
+  'src',
+  'routes',
+  'TransactionRoute'
+));
+const SurveyRoute = require(path.join(
+  __dirname,
+  'src',
+  'routes',
+  'SurveyRoute'
+));
+const AuthRoute = require(path.join(__dirname, 'src', 'routes', 'AuthRoute'));
+const WebsiteRoute = require(path.join(__dirname, 'src', 'routes', 'Website'));
 const LearnMoreRoute = require(path.join(
   __dirname,
+  'src',
   'routes',
   'LearnMoreRoute'
 ));
-const ProfileRoute = require(path.join(__dirname, 'routes', 'ImageRoute'));
-const BidsRoute = require(path.join(__dirname, 'routes', 'BidsRoute'));
-const AdminRoute = require(path.join(__dirname, 'routes', 'AdminRoute'));
-const DframeUser = require(path.join(__dirname, 'routes', 'DframeUser'));
-const Tags = require(path.join(__dirname, 'routes', 'TagRoute'));
+const ProfileRoute = require(path.join(
+  __dirname,
+  'src',
+  'routes',
+  'ImageRoute'
+));
+const BidsRoute = require(path.join(__dirname, 'src', 'routes', 'BidsRoute'));
+const AdminRoute = require(path.join(__dirname, 'src', 'routes', 'AdminRoute'));
+const DframeUser = require(path.join(__dirname, 'src', 'routes', 'DframeUser'));
+const Tags = require(path.join(__dirname, 'src', 'routes', 'TagRoute'));
 
 const cookieParser = require('cookie-parser');
-const { WalletRouter } = require('./routes/wallet.route');
+const { WalletRouter } = require('./src/routes/wallet.route');
+const { CronJob } = require('./src/routes/cron');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -76,6 +94,8 @@ app.use('/tags', Tags);
 app.use('/uploads', express.static('uploads'), ProfileRoute);
 app.use('/wallet', WalletRouter);
 app.use('/websites', WebsiteRoute);
+app.use('/cron', CronJob);
+app.use('/transaction', TransactionRouter);
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
 });

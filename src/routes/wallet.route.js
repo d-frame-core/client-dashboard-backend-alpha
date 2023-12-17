@@ -402,7 +402,7 @@ router.get('/past-transactions/:publicAddress', async (req, res) => {
       toBlock: 'latest',
       filter: {
         to: userWalletAddress,
-      }, 
+      },
     });
 
     const eventToPromises = transferToEvents.map(async (event) => {
