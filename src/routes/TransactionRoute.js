@@ -11,7 +11,7 @@ const transactionController = require(path.join(
 ));
 
 // Create a new transaction
-router.post('/transactions', transactionController.createTransaction);
+router.post('/transactions', transactionController.createTransaction); 
 
 // Get all transactions
 router.get('/transactions', transactionController.getAllTransactions);
