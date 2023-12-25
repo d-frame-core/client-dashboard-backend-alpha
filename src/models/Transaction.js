@@ -6,12 +6,10 @@ const transactionSchema = new mongoose.Schema({
   from: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'DframeUser', // Reference to DframeUser model
-    required: true,
   },
   to: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to User model
-    required: true,
   },
   createdAt: {
     type: Date,

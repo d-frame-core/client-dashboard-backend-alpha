@@ -22,8 +22,9 @@ router.get('/transactions/:id', transactionController.getTransactionById);
 router.put('/update', transactionController.updateStatusToCompleted);
 
 router.get('/pending', transactionController.getPendingTransactions);
+router.get('/active/:id', transactionController.checkUnderReviewTransaction);
 router.get(
-  '/client/:clientId',
+  '/client-history/:id',
   transactionController.getTransactionsByClientId
 );
 
@@ -31,6 +32,13 @@ router.get(
 router.put(
   '/transactions/:id/status',
   transactionController.updateTransactionStatus
+);
+
+router.put('/cancel/:id', transactionController.removeToAndChangeStatus);
+
+router.put(
+  '/transaction/update/:id',
+  transactionController.updateTransactionForClient
 );
 
 // Delete a transaction by ID

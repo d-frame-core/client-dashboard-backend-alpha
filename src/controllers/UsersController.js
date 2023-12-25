@@ -7,6 +7,7 @@ const path = require('path'); // Import the path module
 const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
 const AdsModel = require(path.join(__dirname, '..', 'models', 'AdsModel'));
 require('dotenv').config();
+const nodemailer = require('nodemailer');
 
 //Get all detail
 const getUser = async (req, res) => {
@@ -254,11 +255,33 @@ const signupUser = async (req, res) => {
         companyAddress2: req.body.companyAddress2,
         walletAddress: req.body.walletAddress,
       });
-      const savedUser = await newUser.save();
 
-      res.status(201).json({
-        message: 'Signup successful',
-        user: savedUser,
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'dframe.org@gmail.com',
+          pass: process.env.pass,
+        },
+      });
+
+      const mailOptions = {
+        from: 'dframe.org@gmail.com',
+        to: req.body.companyEmail,
+        subject: 'Welcome to D Frame 😄',
+        text: `You have been registered to D Frame Client Dashboard successfully. \n Hope you enjoy our platform. \n For feedback and suggestions, please contact us at <dframe.org@gmail.com>`,
+      };
+
+      await transporter.sendMail(mailOptions, async (error, info) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).json({ message: 'Email failed' });
+        }
+        const savedUser = await newUser.save();
+
+        res.status(201).json({
+          message: 'Signup successful',
+          user: savedUser,
+        });
       });
     }
   } catch (err) {
