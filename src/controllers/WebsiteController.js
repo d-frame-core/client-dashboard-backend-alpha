@@ -14,6 +14,19 @@ const getAllWebsites = async (req, res) => {
   }
 };
 
+const getWebsitesWithCountGreaterThan500 = async (req, res) => {
+  try {
+    const websites = await WebsiteData.find({ visitorCounts: { $gte: 500 } });
+    return res.json(websites);
+  } catch (error) {
+    console.error(
+      'Error getting websites with count greater than or equal to 500:',
+      error
+    );
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 const updateStatus = async () => {
   try {
     // Find records with visitorCounts greater than or equal to 500
@@ -29,7 +42,9 @@ const updateStatus = async () => {
 };
 
 const addTagsToWebsite = async (req, res) => {
-  const { websiteId, newTags } = req.body;
+  const websiteId = req.params.websiteId;
+  const { newTags } = req.body;
+  console.log('addTagsToWebsite entered', websiteId, newTags);
 
   if (!websiteId || !newTags || !Array.isArray(newTags)) {
     return res.status(400).json({ message: 'Invalid request data' });
@@ -47,6 +62,7 @@ const addTagsToWebsite = async (req, res) => {
     );
 
     if (!updatedWebsite) {
+      console.log('Website not found or already tagged');
       return res
         .status(404)
         .json({ message: 'Website not found or already tagged' });
@@ -62,7 +78,7 @@ const addTagsToWebsite = async (req, res) => {
         );
       })
     );
-
+    console.log('Tags added to website');
     return res.json(updatedWebsite);
   } catch (error) {
     console.error('Error adding tags:', error);
@@ -234,4 +250,5 @@ module.exports = {
   updateStatusToStopped,
   removeTagsFromWebsite,
   changeStatusToTagged,
+  getWebsitesWithCountGreaterThan500,
 };

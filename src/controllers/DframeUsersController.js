@@ -1,12 +1,20 @@
+/** @format */
+
 const path = require('path'); // Import the path module
-const DframeUser = require(path.join(__dirname, '..', 'models', 'DframeUserModel'));
+const DframeUser = require(path.join(
+  __dirname,
+  '..',
+  'models',
+  'DframeUserModel'
+));
 const { default: Web3 } = require('web3');
 // const EthereumTx = require('ethereumjs-tx').Transaction;
 // const Common = require('ethereumjs-common').default;
 require('dotenv').config();
 
-const Web3js = new Web3(`https://polygon-mainnet.infura.io/v3/951e68a3953c4684a4979f33ff797377`);
-
+const Web3js = new Web3(
+  `https://polygon-mainnet.infura.io/v3/951e68a3953c4684a4979f33ff797377`
+);
 
 const privateKey = '';
 const fromAddress = '0x298ab03DD8D59f04b2Fec7BcC75849bD685eea75';
@@ -225,9 +233,7 @@ const dframeABI = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'uint256', name: 'snapshotId', type: 'uint256' },
-    ],
+    inputs: [{ internalType: 'uint256', name: 'snapshotId', type: 'uint256' }],
     name: 'totalSupplyAt',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -255,9 +261,7 @@ const dframeABI = [
     type: 'function',
   },
   {
-    inputs: [
-      { internalType: 'address', name: 'newOwner', type: 'address' },
-    ],
+    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -265,177 +269,174 @@ const dframeABI = [
   },
 ];
 // const contract = new web3.eth.Contract(dframeABI, contractAddress);
-let contract = new Web3js.eth.Contract(dframeABI, contractAddress, { from: fromAddress })
+let contract = new Web3js.eth.Contract(dframeABI, contractAddress, {
+  from: fromAddress,
+});
 
 const sendTokens = async (req, res) => {
-
-  const { walletAddress, privateKey } = req.body;
+  console.log('Sending tokens');
+  const { walletAddress } = req.body;
+  const privateKey = '';
   try {
-      // Get the current date and the first day of the previous month
-      const currentDate = new Date();
-      
-      // Adjust currentDate to be one day before the actual current date
-      currentDate.setDate(currentDate.getDate() - 1);
-  
-      const firstDayOfPreviousMonth = new Date();
-      firstDayOfPreviousMonth.setMonth(firstDayOfPreviousMonth.getMonth() - 1);
-      firstDayOfPreviousMonth.setDate(1);
-      firstDayOfPreviousMonth.setHours(0, 0, 0, 0);
-  
-      // Query users with rewards data
-      const user = await DframeUser.findOne({ publicAddress: walletAddress });
-    
-      // Calculate one-time rewards for the user
-        const userOneTimeRewards =
-          user.rewards.oneTime.kyc1.rewards +
-          user.rewards.oneTime.kyc2.rewards +
-          user.rewards.oneTime.kyc3.rewards ||2;
-  
-        // Calculate daily rewards for the user
-        let userDailyRewards = 0;
-        user.rewards.daily.forEach((dailyEntry) => {
-            dailyEntry.browserData.forEach((entry) => {
-              userDailyRewards += entry.rewards;
-              console.log("dailt for user nad data",user._id);
+    // Get the current date and the first day of the previous month
+    const currentDate = new Date();
+    // Adjust currentDate to be one day before the actual current date
+    currentDate.setDate(currentDate.getDate() - 1);
 
-            });
-  
-            dailyEntry.ad.forEach((entry) => {
-              userDailyRewards += entry.rewards;
-            });
-  
-            dailyEntry.survey.forEach((entry) => {
-              userDailyRewards += entry.rewards;
-            });
-  
-            dailyEntry.referral.forEach((entry) => {
-              userDailyRewards += entry.rewards;
-            });
-        });
-        
-        try {
-          const amountToSend = userOneTimeRewards+userDailyRewards; // Replace with the actual amount of tokens you want to send
-          const amount = Web3js.utils.toHex(Web3js.utils.toWei(amountToSend.toString(),"wei")); // Convert amount to Wei
-          const data = contract.methods.transfer(user.publicAddress, amount).encodeABI();
-          const gasPrice = await Web3js.eth.getGasPrice();
-          const gasLimit = 100000; // You may need to adjust this based on the token contract
-          const nonce = await Web3js.eth.getTransactionCount(fromAddress);
-          const txObj = {
-              nonce: Web3js.utils.toHex(nonce),
-              gasPrice: Web3js.utils.toHex(gasPrice),
-              gasLimit: Web3js.utils.toHex(gasLimit),
-              to: contractAddress,
-              value: "0x00",
-              data: data,
-              from: fromAddress,
-          };
-          const signedTx = await Web3js.eth.accounts.signTransaction(txObj, privateKey);
-          const transaction = await Web3js.eth.sendSignedTransaction(signedTx.rawTransaction);
-          console.log("Transaction hash:", transaction.transactionHash);
-          res.send("Transaction sent successfully!");
-          } catch (error) {
-          console.error("Error sending transaction:", error);
-          res.status(500).send("Error sending transaction");
-          }
-      // Send the array as a response
-      res.json({ userRewardsArray });
+    const firstDayOfPreviousMonth = new Date();
+    firstDayOfPreviousMonth.setMonth(firstDayOfPreviousMonth.getMonth() - 1);
+    firstDayOfPreviousMonth.setDate(1);
+    firstDayOfPreviousMonth.setHours(0, 0, 0, 0);
+
+    // Query users with rewards data
+    const user = await DframeUser.findOne({ publicAddress: walletAddress });
+
+    // Calculate one-time rewards for the user
+    const userOneTimeRewards =
+      user.rewards.oneTime.kyc1.rewards +
+        user.rewards.oneTime.kyc2.rewards +
+        user.rewards.oneTime.kyc3.rewards || 2;
+
+    // Calculate daily rewards for the user
+    let userDailyRewards = 0;
+    user.rewards.daily.forEach((dailyEntry) => {
+      dailyEntry.browserData.forEach((entry) => {
+        userDailyRewards += entry.rewards;
+        console.log('daily data for user', user._id);
+      });
+
+      dailyEntry.ad.forEach((entry) => {
+        userDailyRewards += entry.rewards;
+      });
+
+      dailyEntry.survey.forEach((entry) => {
+        userDailyRewards += entry.rewards;
+      });
+
+      dailyEntry.referral.forEach((entry) => {
+        userDailyRewards += entry.rewards;
+      });
+    });
+
+    try {
+      console.log('Entering transaction');
+      const amountToSend = userOneTimeRewards + userDailyRewards; // Replace with the actual amount of tokens you want to send
+      const amount = Web3js.utils.toHex(
+        Web3js.utils.toWei(amountToSend.toString(), 'wei')
+      ); // Convert amount to Wei
+      const data = contract.methods
+        .transfer(user.publicAddress, amount)
+        .encodeABI();
+      const gasPrice = await Web3js.eth.getGasPrice();
+      const gasLimit = 100000; // You may need to adjust this based on the token contract
+      const nonce = await Web3js.eth.getTransactionCount(fromAddress);
+      const txObj = {
+        nonce: Web3js.utils.toHex(nonce),
+        gasPrice: Web3js.utils.toHex(gasPrice),
+        gasLimit: Web3js.utils.toHex(gasLimit),
+        to: contractAddress,
+        value: '0x00',
+        data: data,
+        from: fromAddress,
+      };
+      const signedTx = await Web3js.eth.accounts.signTransaction(
+        txObj,
+        privateKey
+      );
+      const transaction = await Web3js.eth.sendSignedTransaction(
+        signedTx.rawTransaction
+      );
+      console.log('Transaction hash:', transaction.transactionHash);
+      res.send('Transaction sent successfully!');
     } catch (error) {
-      console.error('Error calculating total rewards:', error);
-      res.status(500).json({ error: 'Error calculating total rewards' });
+      console.error('Error sending transaction:', error);
+      res.status(500).send('Error sending transaction');
     }
+    // Send the array as a response
+    res.json({ userRewardsArray });
+  } catch (error) {
+    console.error('Error calculating total rewards:', error);
+    res.status(500).json({ error: 'Error calculating total rewards' });
+  }
+};
 
-  };
-  
 //Get all detail
 const getUser = async (req, res) => {
-    try {
-        const foundUser = await DframeUser.find()
-        console.log("checking for user")
+  try {
+    const foundUser = await DframeUser.find();
+    console.log('checking for user');
 
-        if(foundUser) {
-            res.status(200).json(foundUser)
-        } else {
-            res.status(200).json("No User Found")
-        }
+    if (foundUser) {
+      res.status(200).json(foundUser);
+    } else {
+      res.status(200).json('No User Found');
     }
-    catch (err) {
-        res.status(500).json({message: "Error Occured"})
-    }
-} 
+  } catch (err) {
+    res.status(500).json({ message: 'Error Occured' });
+  }
+};
 
 //Get detail by id
 const getUserbyid = (req, res) => {
-   const clientId = req.params.id
-   DframeUser.findById(clientId)
-      .then(foundUser => {
-        if (foundUser) {
-            res.status(200).json(foundUser);
-        } else {
-         res.status(200).json("No User Found");
-       }
-    }) 
-      .catch(err => {
-        res.status(500).json({ message: "Error Occured" });
-      });
-        
-  }
+  const clientId = req.params.id;
+  DframeUser.findById(clientId)
+    .then((foundUser) => {
+      if (foundUser) {
+        res.status(200).json(foundUser);
+      } else {
+        res.status(200).json('No User Found');
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: 'Error Occured' });
+    });
+};
 
 const updateUser = (req, res) => {
-    try {
-        DframeUser.updateOne(
-            {_id: req.params.id},
-            {$set: req.body},
-            (err) => {
-            if(!err) {
-                res.status(200).json({message: "Updated Successfully"});
-            }
-        })
-    }
-    catch (err) {
-        res.status(500).json({message: "Error Occures", error: err})
-    }
-}
+  try {
+    DframeUser.updateOne({ _id: req.params.id }, { $set: req.body }, (err) => {
+      if (!err) {
+        res.status(200).json({ message: 'Updated Successfully' });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Error Occures', error: err });
+  }
+};
 
 const deleteUser = (req, res) => {
-    try {
-        DframeUser.deleteOne({userId: req.params.id}, (err) => {
-            if(!err) {
-                res.status(200).json("Deleted Successfully");
-            }
-        })
-    }
-    catch (err) {
-        res.status(500).json({message: "ERROR Occured", error: err})
-    }
-}
+  try {
+    DframeUser.deleteOne({ userId: req.params.id }, (err) => {
+      if (!err) {
+        res.status(200).json('Deleted Successfully');
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'ERROR Occured', error: err });
+  }
+};
 
-
-  const adminUpdateUser = (req, res) => {
-    try {
-        DframeUser.updateOne(
-            {_id: req.params.id},
-            {$set:{ Status: req.body.status }},
-            (err) => {
-            if(!err) {
-                res.status(200).json({message: "Updated Successfully"});
-            }
-        })
-    }
-    catch (err) {
-        res.status(500).json({message: "Error Occures", error: err})
-    }
-}
-               
-
+const adminUpdateUser = (req, res) => {
+  try {
+    DframeUser.updateOne(
+      { _id: req.params.id },
+      { $set: { Status: req.body.status } },
+      (err) => {
+        if (!err) {
+          res.status(200).json({ message: 'Updated Successfully' });
+        }
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ message: 'Error Occures', error: err });
+  }
+};
 
 module.exports = {
-            getUser,
-            getUserbyid,
-            updateUser,
-            deleteUser,
-            adminUpdateUser,
-            sendTokens
-            };
-
-
-
+  getUser,
+  getUserbyid,
+  updateUser,
+  deleteUser,
+  adminUpdateUser,
+  sendTokens,
+};
