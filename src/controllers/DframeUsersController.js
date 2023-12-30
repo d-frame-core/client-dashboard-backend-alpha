@@ -8,6 +8,7 @@ const DframeUser = require(path.join(
   'DframeUserModel'
 ));
 const { default: Web3 } = require('web3');
+const RewardRequest = require('../models/reward.model');
 // const EthereumTx = require('ethereumjs-tx').Transaction;
 // const Common = require('ethereumjs-common').default;
 require('dotenv').config();
@@ -17,7 +18,7 @@ const Web3js = new Web3(
 );
 
 const privateKey = '';
-const fromAddress = '0x298ab03DD8D59f04b2Fec7BcC75849bD685eea75';
+const fromAddress = '0x5Ef4331edbBFEE33e6fAD52Fe77cd504b5b54f29';
 const toAddress = '0x49a1A6aC07fa525359f967EF055EB844b168E9ff';
 const contractAddress = '0x0B6163c61D095b023EC3b52Cc77a9099f6231FCC';
 const amountToSend = 10; // Amount of tokens to transfer
@@ -275,9 +276,10 @@ let contract = new Web3js.eth.Contract(dframeABI, contractAddress, {
 
 const sendTokens = async (req, res) => {
   console.log('Sending tokens');
-  const { walletAddress } = req.body;
-  const privateKey = '';
+  const { walletAddress, privateKey, amountToTransfer, rewardId } = req.body;
   try {
+    const reward = RewardRequest.findById(rewardId);
+
     // Get the current date and the first day of the previous month
     const currentDate = new Date();
     // Adjust currentDate to be one day before the actual current date
@@ -291,47 +293,55 @@ const sendTokens = async (req, res) => {
     // Query users with rewards data
     const user = await DframeUser.findOne({ publicAddress: walletAddress });
 
-    // Calculate one-time rewards for the user
-    const userOneTimeRewards =
-      user.rewards.oneTime.kyc1.rewards +
-        user.rewards.oneTime.kyc2.rewards +
-        user.rewards.oneTime.kyc3.rewards || 2;
+    // // Calculate one-time rewards for the user
+    // const userOneTimeRewards =
+    //   user.rewards.oneTime.kyc1.rewards +
+    //     user.rewards.oneTime.kyc2.rewards +
+    //     user.rewards.oneTime.kyc3.rewards || 2;
 
-    // Calculate daily rewards for the user
-    let userDailyRewards = 0;
-    user.rewards.daily.forEach((dailyEntry) => {
-      dailyEntry.browserData.forEach((entry) => {
-        userDailyRewards += entry.rewards;
-        console.log('daily data for user', user._id);
-      });
+    // // Calculate daily rewards for the user
+    // let userDailyRewards = 0;
+    // user.rewards.daily.forEach((dailyEntry) => {
+    //   dailyEntry.browserData.forEach((entry) => {
+    //     userDailyRewards += entry.rewards;
+    //     console.log('daily data for user', user._id);
+    //   });
 
-      dailyEntry.ad.forEach((entry) => {
-        userDailyRewards += entry.rewards;
-      });
+    //   dailyEntry.ad.forEach((entry) => {
+    //     userDailyRewards += entry.rewards;
+    //   });
 
-      dailyEntry.survey.forEach((entry) => {
-        userDailyRewards += entry.rewards;
-      });
+    //   dailyEntry.survey.forEach((entry) => {
+    //     userDailyRewards += entry.rewards;
+    //   });
 
-      dailyEntry.referral.forEach((entry) => {
-        userDailyRewards += entry.rewards;
-      });
-    });
+    //   dailyEntry.referral.forEach((entry) => {
+    //     userDailyRewards += entry.rewards;
+    //   });
+    // });
 
     try {
       console.log('Entering transaction');
-      const amountToSend = userOneTimeRewards + userDailyRewards; // Replace with the actual amount of tokens you want to send
-      const amount = Web3js.utils.toHex(
-        Web3js.utils.toWei(amountToSend.toString(), 'wei')
-      ); // Convert amount to Wei
+      // const amountToSend = userOneTimeRewards + userDailyRewards; // Replace with the actual amount of tokens you want to send
+      console.log('amount to send ', amountToTransfer);
+      // const amount = Web3js.utils.toHex(
+      //   Web3js.utils.toWei(amountToTransfer.toString(), 'wei')
+      // ); // Convert amount to Wei
+      const amountInWei = Web3js.utils.toWei(
+        amountToTransfer.toString(),
+        'ether'
+      );
+      console.log('amount in wei ', amountInWei);
       const data = contract.methods
-        .transfer(user.publicAddress, amount)
+        .transfer(user.publicAddress, amountInWei)
         .encodeABI();
       const gasPrice = await Web3js.eth.getGasPrice();
       const gasLimit = 100000; // You may need to adjust this based on the token contract
-      const nonce = await Web3js.eth.getTransactionCount(fromAddress);
+      let nonce = await Web3js.eth.getTransactionCount(fromAddress);
+      nonce++;
+      console.log(Web3js.utils.toHex(nonce));
       const txObj = {
-        nonce: Web3js.utils.toHex(nonce),
+        // nonce: Web3js.utils.toHex(nonce),
         gasPrice: Web3js.utils.toHex(gasPrice),
         gasLimit: Web3js.utils.toHex(gasLimit),
         to: contractAddress,
@@ -347,13 +357,53 @@ const sendTokens = async (req, res) => {
         signedTx.rawTransaction
       );
       console.log('Transaction hash:', transaction.transactionHash);
-      res.send('Transaction sent successfully!');
+
+      const startingDate = new Date('2023-01-01').toLocaleDateString('en-GB'); // Replace with your actual starting date
+      const previousMonthDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        0
+      ).toLocaleDateString('en-GB');
+
+      // Update status of one-time rewards
+      await DframeUser.updateMany(
+        {
+          $or: [
+            { 'rewards.oneTime.kyc1.status': 'UNPAID' },
+            { 'rewards.oneTime.kyc2.status': 'UNPAID' },
+            { 'rewards.oneTime.kyc3.status': 'UNPAID' },
+          ],
+        },
+        {
+          $set: {
+            'rewards.oneTime.kyc1.status': 'PAID',
+            'rewards.oneTime.kyc2.status': 'PAID',
+            'rewards.oneTime.kyc3.status': 'PAID',
+          },
+        }
+      );
+
+      // Update status of daily rewards
+      await DframeUser.updateMany(
+        {
+          'rewards.daily.date': {
+            $gte: startingDate,
+            $lte: previousMonthDate,
+          },
+        },
+        { $set: { 'rewards.daily.$.status': 'PAID' } }
+      );
+
+      await reward.updateOne({
+        status: 'COMPLETED',
+      });
+      res.status(201).send('Transaction sent successfully!');
     } catch (error) {
       console.error('Error sending transaction:', error);
       res.status(500).send('Error sending transaction');
     }
     // Send the array as a response
-    res.json({ userRewardsArray });
+    // res.json({ message: 'Tokens sent successfully!' });
   } catch (error) {
     console.error('Error calculating total rewards:', error);
     res.status(500).json({ error: 'Error calculating total rewards' });

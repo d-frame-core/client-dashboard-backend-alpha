@@ -86,6 +86,48 @@ const addTagsToWebsite = async (req, res) => {
   }
 };
 
+const addSingleTagToWebsite = async (req, res) => {
+  const websiteId = req.params.websiteId;
+  const newTag = req.body.newTag;
+  console.log('addTagToWebsite entered', websiteId, newTag);
+
+  if (!websiteId || !newTag || typeof newTag !== 'string') {
+    return res.status(400).json({ message: 'Invalid request data' });
+  }
+
+  try {
+    // Update the WebsiteData document
+    const updatedWebsite = await WebsiteData.findOneAndUpdate(
+      { _id: websiteId, status: { $ne: 'TAGGED' } },
+      {
+        $addToSet: { tags: newTag },
+        $set: { status: 'TAGGED' },
+      },
+      { new: true }
+    );
+
+    if (!updatedWebsite) {
+      console.log('Website not found or already tagged');
+      return res
+        .status(404)
+        .json({ message: 'Website not found or already tagged' });
+    }
+
+    // Update the Tag document
+    await Tag.findOneAndUpdate(
+      { name: newTag },
+      { $addToSet: { websites: websiteId } },
+      { upsert: true }
+    );
+
+    console.log('Tag added to website');
+    return res.json(updatedWebsite);
+  } catch (error) {
+    console.error('Error adding tag:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 const updateStatusToStopped = async (req, res) => {
   const { websiteId } = req.params;
 
@@ -251,4 +293,5 @@ module.exports = {
   removeTagsFromWebsite,
   changeStatusToTagged,
   getWebsitesWithCountGreaterThan500,
+  addSingleTagToWebsite,
 };

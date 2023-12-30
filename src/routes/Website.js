@@ -15,7 +15,10 @@ router.get(
 
 router.get('/admin/dataPool', websiteController.dataPool);
 // Route to add tags to a website
-router.post('/admin/addTags/:websiteId', websiteController.addTagsToWebsite);
+router.post(
+  '/admin/addTags/:websiteId',
+  websiteController.addSingleTagToWebsite
+);
 
 // Route to update the status to STOPPED
 router.put(
