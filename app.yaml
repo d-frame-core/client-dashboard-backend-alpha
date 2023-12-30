@@ -9,3 +9,4 @@ env_variables:
   ALCHEMY_RPC: 'https://polygon-mainnet.g.alchemy.com/v2/nHyM53VqfExPfPNYL5VLT1urCiUOunq_'
   PORT: 8080
   GCP_PROJECTID: 'scenic-sunspot-391708'
+  pass: 'zhqrmhtgweujapvc'
