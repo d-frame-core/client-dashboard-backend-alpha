@@ -211,6 +211,87 @@ router.get('/admin/totalClient', async (req, res) => {
     });
   });
 });
+// /admin/allinfo route
+router.get('/admin/allinfo', async (req, res) => {
+  try {
+    // Get total count for DFrameUsers and Users
+    const dframeUsersCount = await DframeUser.countDocuments();
+    const usersCount = await UsersModel.countDocuments();
 
+    // Get total counts and status-based counts for surveys
+    const totalSurveys = await Survey.countDocuments();
+    const surveyInfo = await Survey.aggregate([
+      {
+        $group: {
+          _id: '$statusCampaign',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Get total counts and status-based counts for ads
+    const totalAds = await Ad.countDocuments();
+    const adInfo = await Ad.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Get total counts and status-based counts for reward requests
+    const totalRewards = await RewardRequest.countDocuments();
+    const rewardInfo = await RewardRequest.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Get total counts and status-based counts for transactions
+    const totalTransactions = await Transaction.countDocuments();
+    const transactionInfo = await Transaction.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Get total counts and status-based counts for tags
+    const totalTags = await Tag.countDocuments();
+    const tagInfo = await Tag.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Combine results
+    const allInfo = {
+      usersInfo: { total: dframeUsersCount },
+      surveyInfo: { total: totalSurveys, status: surveyInfo },
+      adInfo: { total: totalAds, status: adInfo },
+      rewardInfo: { total: totalRewards, status: rewardInfo },
+      transactionInfo: { total: totalTransactions, status: transactionInfo },
+      tagInfo: { total: totalTags, status: tagInfo },
+      clientInfo: { total: usersCount },
+    };
+
+    // Send the response
+    res.status(200).json(allInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+});
 module.exports = router;
 module.exports.UserInfo = router;
