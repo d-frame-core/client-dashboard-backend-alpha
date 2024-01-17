@@ -47,6 +47,8 @@ const { WalletRouter } = require('./src/routes/wallet.route');
 const { CronJob } = require('./src/routes/cron');
 const { RewardRequestRouter } = require('./src/routes/RewardRoute');
 const { UserInfo } = require('./src/routes/Info');
+const Survey = require('./src/models/SurveyModel');
+const AdsModel = require('./src/models/AdsModel');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -100,6 +102,7 @@ app.use('/cron', CronJob);
 app.use('/transaction', TransactionRouter);
 app.use('/rewards', RewardRequestRouter);
 app.use('/userinfo', UserInfo);
+
 app.use('/', (req, res) => {
   res.status(200).send('App is live');
 });

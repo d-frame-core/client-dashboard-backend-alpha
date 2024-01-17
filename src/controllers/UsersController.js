@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const path = require('path'); // Import the path module
 
-const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
+// const User = require(path.join(__dirname, '..', 'models', 'UsersModel'));
 const AdsModel = require(path.join(__dirname, '..', 'models', 'AdsModel'));
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-
+const { User } = require('../models/UsersModel');
 //Get all detail
 const getUser = async (req, res) => {
   try {
@@ -38,6 +38,7 @@ const getUnverifiedUser = async (req, res) => {
 };
 
 const { Storage } = require('@google-cloud/storage');
+const UsersModel = require('../models/UsersModel');
 
 // Set up Google Cloud Storage
 const storageClient = new Storage({
@@ -202,6 +203,7 @@ const loginUser = async (req, res) => {
   const walletAddress = req.body.walletAddress;
   try {
     const user = await User.findOne({ walletAddress });
+    console.log(`Login request from`, walletAddress);
     if (user) {
       const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, {
         expiresIn: '30d',
@@ -240,6 +242,7 @@ const checkToken = (req, res, next) => {
 
 const signupUser = async (req, res) => {
   const walletAddress = req.body.walletAddress;
+  console.log(`Signup Request from`, walletAddress);
   try {
     const user = await User.findOne({ walletAddress });
     if (user) {

@@ -27,6 +27,7 @@ const adSchema = new mongoose.Schema(
     image: String,
     adType: String,
     adContent: String,
+    adUrl: String,
     adImpressions: Number,
     staus: String,
     tags: [],

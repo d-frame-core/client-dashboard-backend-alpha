@@ -8,6 +8,7 @@ const Survey = require('../models/SurveyModel');
 const Ad = require('../models/AdsModel');
 const RewardRequest = require('../models/reward.model');
 const Transaction = require('../models/Transaction');
+const { User } = require('../models/UsersModel');
 const { Tag } = require('../models/Tags');
 const UsersModel = require('../models/UsersModel');
 const router = express.Router();
@@ -216,7 +217,7 @@ router.get('/admin/allinfo', async (req, res) => {
   try {
     // Get total count for DFrameUsers and Users
     const dframeUsersCount = await DframeUser.countDocuments();
-    const usersCount = await UsersModel.countDocuments();
+    const usersCount = await User.countDocuments();
 
     // Get total counts and status-based counts for surveys
     const totalSurveys = await Survey.countDocuments();

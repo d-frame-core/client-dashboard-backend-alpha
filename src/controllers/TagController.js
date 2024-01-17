@@ -42,7 +42,6 @@ const getTagById = async (req, res) => {
 const getAllTags = async (req, res) => {
   try {
     const tags = await Tag.find();
-    console.log('running the server ');
 
     res.status(200).json(tags);
   } catch (err) {

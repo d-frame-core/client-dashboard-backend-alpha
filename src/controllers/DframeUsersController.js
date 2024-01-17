@@ -9,6 +9,7 @@ const DframeUser = require(path.join(
 ));
 const { default: Web3 } = require('web3');
 const RewardRequest = require('../models/reward.model');
+const DFrameUser = require('../models/DframeUserModel');
 // const EthereumTx = require('ethereumjs-tx').Transaction;
 // const Common = require('ethereumjs-common').default;
 require('dotenv').config();
@@ -18,10 +19,10 @@ const Web3js = new Web3(
 );
 
 const privateKey = '';
-const fromAddress = '0x5Ef4331edbBFEE33e6fAD52Fe77cd504b5b54f29';
-const toAddress = '0x49a1A6aC07fa525359f967EF055EB844b168E9ff';
+// const fromAddress = '0x5Ef4331edbBFEE33e6fAD52Fe77cd504b5b54f29';
+// const toAddress = '0x49a1A6aC07fa525359f967EF055EB844b168E9ff';
 const contractAddress = '0x0B6163c61D095b023EC3b52Cc77a9099f6231FCC';
-const amountToSend = 10; // Amount of tokens to transfer
+// const amountToSend = 10; // Amount of tokens to transfer
 const dframeABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
@@ -269,14 +270,22 @@ const dframeABI = [
     type: 'function',
   },
 ];
-// const contract = new web3.eth.Contract(dframeABI, contractAddress);
-let contract = new Web3js.eth.Contract(dframeABI, contractAddress, {
-  from: fromAddress,
-});
 
 const sendTokens = async (req, res) => {
   console.log('Sending tokens');
-  const { walletAddress, privateKey, amountToTransfer, rewardId } = req.body;
+  // const contract = new web3.eth.Contract(dframeABI, contractAddress);
+  const { walletAddress, privateKey, amountToTransfer, rewardId, fromAddress } =
+    req.body;
+
+  console.log('Wallet Address: ', walletAddress);
+  console.log('Private Key: ', privateKey);
+  console.log('amount: ', amountToTransfer);
+  console.log('Reward: ', rewardId);
+  console.log('From Address: ', fromAddress);
+
+  let contract = new Web3js.eth.Contract(dframeABI, contractAddress, {
+    from: fromAddress,
+  });
   try {
     const reward = RewardRequest.findById(rewardId);
 
@@ -349,14 +358,18 @@ const sendTokens = async (req, res) => {
         data: data,
         from: fromAddress,
       };
+
+      console.log('txObj is', txObj);
       const signedTx = await Web3js.eth.accounts.signTransaction(
         txObj,
         privateKey
       );
-      const transaction = await Web3js.eth.sendSignedTransaction(
-        signedTx.rawTransaction
-      );
-      console.log('Transaction hash:', transaction.transactionHash);
+
+      console.log('signed tx is', signedTx);
+      // const transaction = await Web3js.eth.sendSignedTransaction(
+      //   signedTx.rawTransaction
+      // );
+      // console.log('Transaction hash:', transaction.transactionHash);
 
       const startingDate = new Date('2023-01-01').toLocaleDateString('en-GB'); // Replace with your actual starting date
       const previousMonthDate = new Date(
@@ -366,7 +379,7 @@ const sendTokens = async (req, res) => {
       ).toLocaleDateString('en-GB');
 
       // Update status of one-time rewards
-      await DframeUser.updateMany(
+      await DFrameUser.updateMany(
         {
           $or: [
             { 'rewards.oneTime.kyc1.status': 'UNPAID' },
@@ -384,7 +397,7 @@ const sendTokens = async (req, res) => {
       );
 
       // Update status of daily rewards
-      await DframeUser.updateMany(
+      await DFrameUser.updateMany(
         {
           'rewards.daily.date': {
             $gte: startingDate,

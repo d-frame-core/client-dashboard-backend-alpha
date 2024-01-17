@@ -12,7 +12,7 @@ const DframeUser = require(path.join(
   'models',
   'DframeUserModel'
 ));
-
+const { User } = require('../models/UsersModel');
 require('dotenv').config();
 // Create a new surveyddd
 // exports.createSurvey = async (req, res) => {
@@ -252,7 +252,7 @@ exports.verifyStatus = async (req, res) => {
         pass: process.env.pass,
       },
     });
-    const user = await UsersModel.findById(survey.clientId);
+    const user = await User.findById(survey.clientId);
 
     const mailOptions = {
       from: 'dframe.org@gmail.com',
@@ -298,7 +298,7 @@ exports.stopStatus = async (req, res) => {
         pass: process.env.pass,
       },
     });
-    const user = await UsersModel.findById(survey.clientId);
+    const user = await User.findById(survey.clientId);
 
     const mailOptions = {
       from: 'dframe.org@gmail.com',
